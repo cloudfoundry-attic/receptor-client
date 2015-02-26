@@ -1,10 +1,13 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
+group = 'io.pivotal.receptor'
+version = '0.0.1-SNAPSHOT'
+
 jar {
     baseName = 'receptor-client'
-    version = '0.0.1-SNAPSHOT'
 }
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
