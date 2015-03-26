@@ -60,6 +60,12 @@ public class DesiredLRPCreateRequest {
 	@JsonProperty("no_monitor")
 	private boolean noMonitor = false;
 
+	@JsonProperty("log_guid")
+	private String logGuid;
+
+	@JsonProperty("log_source")
+	private String logSource = "APP";
+
 	public final RunAction runAction = new RunAction();
 
 	private final Map<String,RunAction> action = Collections.singletonMap("run", runAction);
@@ -154,6 +160,22 @@ public class DesiredLRPCreateRequest {
 
 	public void setNoMonitor(boolean noMonitor) {
 		this.noMonitor = noMonitor;
+	}
+
+	public String getLogGuid() {
+		return (logGuid == null ? processGuid : logGuid);
+	}
+
+	public void setLogGuid(String logGuid) {
+		this.logGuid = logGuid;
+	}
+
+	public String getLogSource() {
+		return logSource;
+	}
+
+	public void setLogSource(String logSource) {
+		this.logSource = logSource;
 	}
 
 	public Map<String,RunAction> getAction() {
