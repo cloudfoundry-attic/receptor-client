@@ -16,9 +16,8 @@
 
 package io.pivotal.receptor.client;
 
+import static org.junit.Assert.assertEquals;
 import io.pivotal.receptor.commands.DesiredLRPCreateRequest;
-
-import java.net.Inet4Address;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,59 +32,32 @@ public class ReceptorClientTests {
 
 	private static final Log logger = LogFactory.getLog(ReceptorClientTests.class);
 
+	private static final String APP_DOCKER_PATH = "docker:///cloudfoundry/lattice-app";
+
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-	@Test
-	public void findAll() {
-		ReceptorClient client = new ReceptorClient();
-		client.findAllLongRunningProcesses();
-	}
+	private final ReceptorClient client = new ReceptorClient();
 
 	@Test
-	public void ticktock() throws Exception {
-		ReceptorClient client = new ReceptorClient();
-
-		try {
-			client.destroyLongRunningProcess("xd-source");
+	public void createAndDeleteLRP() throws Exception {
+		DesiredLRPCreateRequest request = new DesiredLRPCreateRequest();
+		request.setProcessGuid("test-app");
+		request.setRootfs(APP_DOCKER_PATH);
+		request.runAction.setPath("/lattice-app");
+		request.addRoute(8080, new String[] {"test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io"});
+		logger.info("creating LRP: " + objectMapper.writeValueAsString(request));
+		client.createDesiredLRP(request);
+		assertEquals("test-app", client.getDesiredLRPs().get(0).getProcessGuid());
+		assertEquals("test-app", client.getActualLRPs().get(0).getProcessGuid());
+		client.deleteDesiredLRP("test-app");
+		for (int i = 0; i < 100; i++) {
+			Thread.sleep(100);
+			if (0 == client.getActualLRPsByProcessGuid("test-app").size()) {
+				break;
+			}
 		}
-		catch (Exception e) {
-			// not running, ignore
-		}
-		try {
-			client.destroyLongRunningProcess("xd-sink");
-		}
-		catch (Exception e) {
-			// not running, ignore
-		}
-
-		String host = Inet4Address.getLocalHost().getHostAddress();
-		String dockerPath = "docker:///pperalta/xd";
-		String jarPath = "/opt/xd/lib/xolpoc-0.0.1-SNAPSHOT.jar";
-
-		DesiredLRPCreateRequest sink = new DesiredLRPCreateRequest();
-		sink.setProcessGuid("xd-sink");
-		sink.setRootfs(dockerPath);
-		sink.runAction.setPath("java");
-		sink.runAction.addArg("-Dmodule=ticktock.sink.log.1");
-		sink.runAction.addArg("-Dspring.redis.host=" + host);
-		sink.runAction.addArg("-Dserver.port=9999");
-		sink.runAction.addArg("-jar");
-		sink.runAction.addArg(jarPath);
-		sink.addRoute(8080, new String[] {"xd-sink.192.168.11.11.xip.io", "xd-sink-8080.192.168.11.11.xip.io"});
-		logger.info("creating LRP for sink: " + objectMapper.writeValueAsString(sink));
-		client.createLongRunningProcess(sink);
-
-		DesiredLRPCreateRequest source = new DesiredLRPCreateRequest();
-		source.setProcessGuid("xd-source");
-		source.setRootfs(dockerPath);
-		source.runAction.setPath("java");
-		source.runAction.addArg("-Dmodule=ticktock.source.time.0");
-		source.runAction.addArg("-Dspring.redis.host=" + host);
-		source.runAction.addArg("-Dserver.port=8888");
-		source.runAction.addArg("-jar");
-		source.runAction.addArg(jarPath);
-		source.addRoute(8080, new String[] {"xd-source.192.168.11.11.xip.io", "xd-source-8080.192.168.11.11.xip.io"});
-		logger.info("creating LRP for source: " + objectMapper.writeValueAsString(source));
-		client.createLongRunningProcess(source);
+		assertEquals(0, client.getDesiredLRPs().size());
+		assertEquals(0, client.getActualLRPs().size());
 	}
+
 }

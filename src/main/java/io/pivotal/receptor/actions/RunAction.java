@@ -20,8 +20,10 @@ import io.pivotal.receptor.support.EnvironmentVariable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.springframework.util.StringUtils;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Mark Fisher
@@ -33,6 +35,9 @@ public class RunAction {
 	private final ArrayList<String> args = new ArrayList<String>();
 
 	private String dir;
+
+	@JsonProperty("resource_limits")
+	private Map<String, String> resourceLimits = new HashMap<String,String>();
 
 	private EnvironmentVariable[] env;
 
@@ -51,10 +56,6 @@ public class RunAction {
 	public void setArgs(String[] args) {
 		this.args.clear();
 		this.args.addAll(Arrays.asList(args));
-	}
-
-	public void setArgs(String args) {
-		this.setArgs(StringUtils.tokenizeToStringArray(args, " "));
 	}
 
 	public void addArg(String arg) {

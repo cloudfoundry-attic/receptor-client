@@ -18,13 +18,16 @@ package io.pivotal.receptor.commands;
 
 import io.pivotal.receptor.actions.RunAction;
 import io.pivotal.receptor.support.EnvironmentVariable;
+import io.pivotal.receptor.support.Route;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.util.ObjectUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -45,7 +48,7 @@ public class DesiredLRPCreateRequest {
 
 	private int[] ports = new int[] { 8080 };
 
-	private Map<String, Route[]> routes = new HashMap<String, DesiredLRPCreateRequest.Route[]>();
+	private Map<String, Route[]> routes = new HashMap<String, Route[]>();
 
 	private EnvironmentVariable[] env = new EnvironmentVariable[] {
 		new EnvironmentVariable("PORT", "8080")
@@ -66,9 +69,8 @@ public class DesiredLRPCreateRequest {
 	@JsonProperty("log_source")
 	private String logSource = "APP";
 
-	public final RunAction runAction = new RunAction();
-
-	private final Map<String,RunAction> action = Collections.singletonMap("run", runAction);
+	@JsonIgnore
+	public RunAction runAction = new RunAction();
 
 	public String getProcessGuid() {
 		return processGuid;
@@ -177,39 +179,22 @@ public class DesiredLRPCreateRequest {
 	public void setLogSource(String logSource) {
 		this.logSource = logSource;
 	}
-
-	public Map<String,RunAction> getAction() {
-		return action;
+	
+	public Map<String, RunAction> getAction() {
+		return Collections.singletonMap("run",  runAction);
 	}
 
-	@SuppressWarnings("unused")
-	private static class Route {
-
-		private String[] hostnames;
-
-		private int port;
-
-		private Route() {}
-
-		private Route(int port, String... hostnames) {
-			this.port = port;
-			this.hostnames = hostnames;
-		}
-
-		public String[] getHostnames() {
-			return hostnames;
-		}
-
-		public void setHostnames(String... hostnames) {
-			this.hostnames = hostnames;
-		}
-
-		public int getPort() {
-			return port;
-		}
-
-		public void setPort(int port) {
-			this.port = port;
-		}
+	public void setAction(Map<String, RunAction> action) {
+		this.runAction = action.get("run");
 	}
+
+	@Override
+	public String toString() {
+		return "DesiredLRPCreateRequest [processGuid=" + processGuid + ", domain=" + domain + ", rootfs=" + rootfs
+				+ ", instances=" + instances + ", stack=" + stack + ", ports=" + Arrays.toString(ports) + ", routes="
+				+ routes + ", env=" + Arrays.toString(env) + ", memoryMb=" + memoryMb + ", diskMb=" + diskMb
+				+ ", noMonitor=" + noMonitor + ", logGuid=" + logGuid + ", logSource=" + logSource + ", runAction="
+				+ runAction + "]";
+	}
+
 }

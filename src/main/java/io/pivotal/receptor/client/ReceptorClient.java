@@ -18,6 +18,8 @@ package io.pivotal.receptor.client;
 
 import io.pivotal.receptor.commands.ActualLRPResponse;
 import io.pivotal.receptor.commands.DesiredLRPCreateRequest;
+import io.pivotal.receptor.commands.DesiredLRPResponse;
+import io.pivotal.receptor.commands.DesiredLRPUpdateRequest;
 
 import java.util.List;
 
@@ -33,6 +35,8 @@ import org.springframework.web.client.RestTemplate;
 public class ReceptorClient {
 
 	private static final String DEFAULT_RECEPTOR_HOST = "receptor.192.168.11.11.xip.io";
+
+	private static final ParameterizedTypeReference<List<DesiredLRPResponse>> DESIRED_LRP_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<DesiredLRPResponse>>(){};
 
 	private static final ParameterizedTypeReference<List<ActualLRPResponse>> ACTUAL_LRP_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<ActualLRPResponse>>(){};
 
@@ -53,23 +57,51 @@ public class ReceptorClient {
 	}
 
 	private ReceptorClient(String receptorHost, RestTemplate restTemplate) {
-		this.baseUrl = "http://" + receptorHost + "/v1";
+		this.baseUrl = (receptorHost.contains("://") ? receptorHost : "http://" + receptorHost) + "/v1";
 		this.restTemplate = restTemplate;
 	}
 
-	public void createLongRunningProcess(DesiredLRPCreateRequest process) {
-		restTemplate.postForEntity("{baseUrl}/desired_lrps", process, null, baseUrl);
+	public void createDesiredLRP(DesiredLRPCreateRequest request) {
+		restTemplate.postForEntity("{baseUrl}/desired_lrps", request, null, baseUrl);
 	}
 
-	public void destroyLongRunningProcess(String guid) {
-		restTemplate.delete("{baseUrl}/desired_lrps/{guid}", baseUrl, guid);
+	public DesiredLRPResponse getDesiredLRP(String processGuid) {
+		return restTemplate.exchange("{baseUrl}/desired_lrps/{processGuid}", HttpMethod.GET, null, DesiredLRPResponse.class, baseUrl, processGuid).getBody();
 	}
 
-	public List<ActualLRPResponse> findAllLongRunningProcesses() {
+	public List<DesiredLRPResponse> getDesiredLRPs() {
+		return restTemplate.exchange("{baseUrl}/desired_lrps", HttpMethod.GET, null, DESIRED_LRP_RESPONSE_LIST_TYPE, baseUrl).getBody();
+	}
+
+	public List<DesiredLRPResponse> getDesiredLRPsByDomain(String domain) {
+		return restTemplate.exchange("{baseUrl}/desired_lrps?domain={domain}", HttpMethod.GET, null, DESIRED_LRP_RESPONSE_LIST_TYPE, baseUrl, domain).getBody();
+	}
+
+	public void updateDesiredLRP(String processGuid, DesiredLRPUpdateRequest request) {
+		restTemplate.put("{baseUrl}/desired_lrps/{processGuid}", request, baseUrl, processGuid);
+	}
+
+	public void deleteDesiredLRP(String processGuid) {
+		restTemplate.delete("{baseUrl}/desired_lrps/{processGuid}", baseUrl, processGuid);
+	}
+
+	public List<ActualLRPResponse> getActualLRPs() {
 		return restTemplate.exchange("{baseUrl}/actual_lrps", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl).getBody();		
 	}
 
-	public List<ActualLRPResponse> findLongRunningProcesses(String guid) {
-		return restTemplate.exchange("{baseUrl}/actual_lrps/{guid}", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl, guid).getBody();
+	public List<ActualLRPResponse> getActualLRPsByDomain(String domain) {
+		return restTemplate.exchange("{baseUrl}/actual_lrps?domain={domain}", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl, domain).getBody();
+	}
+
+	public List<ActualLRPResponse> getActualLRPsByProcessGuid(String processGuid) {
+		return restTemplate.exchange("{baseUrl}/actual_lrps/{processGuid}", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl, processGuid).getBody();
+	}
+
+	public ActualLRPResponse getActualLRPByProcessGuidAndIndex(String processGuid, int index) {
+		return restTemplate.exchange("{baseUrl}/actual_lrps/{processGuid}/index/{index}", HttpMethod.GET, null, ActualLRPResponse.class, baseUrl, processGuid, index).getBody();
+	}
+
+	public void killActualLRPByProcessGuidAndIndex(String processGuid, int index) {
+		restTemplate.delete("{baseUrl}/actual_lrps/{processGuid}/index/{index}", baseUrl, processGuid, index);
 	}
 }
