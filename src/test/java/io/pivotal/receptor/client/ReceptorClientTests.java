@@ -17,7 +17,12 @@
 package io.pivotal.receptor.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import io.pivotal.receptor.commands.CellResponse;
 import io.pivotal.receptor.commands.DesiredLRPCreateRequest;
+import io.pivotal.receptor.commands.TaskCreateRequest;
+
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,4 +65,71 @@ public class ReceptorClientTests {
 		assertEquals(0, client.getActualLRPs().size());
 	}
 
+	@Test
+	public void createAndDeleteTask() throws Exception {
+		TaskCreateRequest request = new TaskCreateRequest();
+		request.setTaskGuid("test-task");
+		request.setRootfs("docker:///cloudfoundry/lucid64");
+		request.runAction.setPath("/bin/sh");
+		request.runAction.setArgs(new String[] {"-c", "exit 1"});
+		request.runAction.setDir("/tmp");
+		assertEquals(0, client.getTasks().size());
+		logger.info("creating Task: " + objectMapper.writeValueAsString(request));
+		client.createTask(request);
+		assertEquals(1, client.getTasks().size());
+		assertEquals("/bin/sh", client.getTask("test-task").getAction().get("run").getPath());
+		for (int i = 0; i < 100; i++) {
+			String state = client.getTask("test-task").getState();
+			if ("COMPLETED".equals(state)) {
+				break;
+			}
+			Thread.sleep(100);
+		}
+		assertEquals("COMPLETED", client.getTask("test-task").getState());
+		client.deleteTask("test-task");
+		assertEquals(0, client.getTasks().size());
+	}
+
+	@Test
+	public void createAndCancelTask() throws Exception {
+		TaskCreateRequest request = new TaskCreateRequest();
+		request.setTaskGuid("test-task");
+		request.setRootfs("docker:///cloudfoundry/lucid64");
+		request.runAction.setPath("/bin/sh");
+		request.runAction.setArgs(new String[] {"-c", "sleep 3;exit 1"});
+		request.runAction.setDir("/tmp");
+		assertEquals(0, client.getTasks().size());
+		logger.info("creating Task: " + objectMapper.writeValueAsString(request));
+		client.createTask(request);
+		assertEquals(1, client.getTasks().size());
+		assertEquals("/bin/sh", client.getTask("test-task").getAction().get("run").getPath());
+		boolean cancelled = false;
+		for (int i = 0; i < 100; i++) {
+			String state = client.getTask("test-task").getState();
+			if ("RUNNING".equals(state)) {
+				client.cancelTask("test-task");
+				cancelled = true;
+				break;
+			}
+			Thread.sleep(100);
+		}
+		assertTrue(cancelled);
+		assertEquals("COMPLETED", client.getTask("test-task").getState());
+		client.deleteTask("test-task");
+		assertEquals(0, client.getTasks().size());
+	}
+
+	@Test
+	public void getDomains() {
+		String[] domains = client.getDomains();
+		assertEquals(1, domains.length);
+		assertEquals("lattice", domains[0]);
+	}
+
+	@Test
+	public void getCells() {
+		List<CellResponse> cells = client.getCells();
+		assertEquals(1, cells.size());
+		assertEquals("lattice-cell-01", cells.get(0).getCellId());
+	}
 }

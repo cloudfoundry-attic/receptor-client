@@ -77,4 +77,10 @@ public class RunAction {
 	public void setEnv(EnvironmentVariable[] env) {
 		this.env = env;
 	}
+
+	@Override
+	public String toString() {
+		return "RunAction [path=" + path + ", args=" + args + ", dir=" + dir + ", resourceLimits=" + resourceLimits
+				+ ", env=" + Arrays.toString(env) + "]";
+	}
 }
