@@ -23,8 +23,13 @@ import io.pivotal.receptor.commands.DesiredLRPResponse;
 import io.pivotal.receptor.commands.DesiredLRPUpdateRequest;
 import io.pivotal.receptor.commands.TaskCreateRequest;
 import io.pivotal.receptor.commands.TaskResponse;
+import io.pivotal.receptor.events.EventListener;
+import io.pivotal.receptor.events.EventSubscription;
+import io.pivotal.receptor.events.ReceptorEvent;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -52,6 +57,8 @@ public class ReceptorClient {
 	private final String baseUrl;
 
 	private final RestTemplate restTemplate;
+
+	private final Executor executor = Executors.newCachedThreadPool();
 
 	public ReceptorClient() {
 		this(DEFAULT_RECEPTOR_HOST);
@@ -160,5 +167,14 @@ public class ReceptorClient {
 
 	public String[] getDomains() {
 		return restTemplate.exchange("{baseUrl}/domains", HttpMethod.GET, null, String[].class, baseUrl).getBody();
+	}
+
+	/**
+	 * Temporary implementation that submits each subscription as a Runnable to an Executor.
+	 *
+	 * @param listener the listener to invoke when Events arrive
+	 */
+	public <E extends ReceptorEvent<?>> void subscribeToEvents(EventListener<E> listener) {
+		executor.execute(new EventSubscription<E>(String.format("%s/events", baseUrl), listener));
 	}
 }

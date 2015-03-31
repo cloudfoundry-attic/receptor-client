@@ -16,19 +16,22 @@
 
 package io.pivotal.receptor.commands;
 
+import io.pivotal.receptor.actions.Action;
 import io.pivotal.receptor.actions.RunAction;
 import io.pivotal.receptor.support.EnvironmentVariable;
 import io.pivotal.receptor.support.Route;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author Mark Fisher
@@ -54,11 +57,16 @@ public class DesiredLRPCreateRequest {
 		new EnvironmentVariable("PORT", "8080")
 	};
 
-	@JsonProperty("memory_mb")
-	private int memoryMb = 128;
+	@JsonProperty("cpu_weight")
+	private int cpuWeight;
 
 	@JsonProperty("disk_mb")
 	private int diskMb = 1024;
+
+	@JsonProperty("memory_mb")
+	private int memoryMb = 128;
+
+	private boolean privileged;
 
 	@JsonProperty("no_monitor")
 	private boolean noMonitor = false;
@@ -66,11 +74,25 @@ public class DesiredLRPCreateRequest {
 	@JsonProperty("log_guid")
 	private String logGuid;
 
+	@JsonProperty("metrics_guid")
+	private String metricsGuid;
+
 	@JsonProperty("log_source")
 	private String logSource = "APP";
 
-	@JsonIgnore
-	public RunAction runAction = new RunAction();
+	@JsonInclude(Include.NON_EMPTY)
+	@JsonDeserialize(using = ActionMapSerializer.class)
+	private Map<String, Action> setup = new HashMap<String, Action>();
+
+	@JsonDeserialize(using = ActionMapSerializer.class)
+	private Map<String, Action> action = new HashMap<String, Action>();
+
+	@JsonInclude(Include.NON_EMPTY)
+	@JsonDeserialize(using = ActionMapSerializer.class)
+	private Map<String, Action> monitor = new HashMap<String, Action>();
+
+	@JsonProperty("start_timeout")
+	private int startTimeout;
 
 	public String getProcessGuid() {
 		return processGuid;
@@ -156,6 +178,22 @@ public class DesiredLRPCreateRequest {
 		this.diskMb = diskMb;
 	}
 
+	public int getCpuWeight() {
+		return cpuWeight;
+	}
+
+	public void setCpuWeight(int cpuWeight) {
+		this.cpuWeight = cpuWeight;
+	}
+
+	public boolean isPrivileged() {
+		return privileged;
+	}
+
+	public void setPriviliged(boolean priviliged) {
+		this.privileged = priviliged;
+	}
+
 	public boolean isNoMonitor() {
 		return noMonitor;
 	}
@@ -179,22 +217,61 @@ public class DesiredLRPCreateRequest {
 	public void setLogSource(String logSource) {
 		this.logSource = logSource;
 	}
-	
-	public Map<String, RunAction> getAction() {
-		return Collections.singletonMap("run",  runAction);
+
+	public String getMetricsGuid() {
+		return metricsGuid;
 	}
 
-	public void setAction(Map<String, RunAction> action) {
-		this.runAction = action.get("run");
+	public void setMetricsGuid(String metricsGuid) {
+		this.metricsGuid = metricsGuid;
+	}
+
+	public Map<String, Action> getSetup() {
+		return setup;
+	}
+
+	public void setSetup(Map<String, Action> setup) {
+		this.setup = setup;
+	}
+
+	public Map<String, Action> getAction() {
+		return action;
+	}
+
+	public void setAction(Map<String, Action> action) {
+		this.action = action;
+	}
+
+	@JsonIgnore
+	public RunAction runAction() {
+		action.putIfAbsent("run", new RunAction());
+		return (RunAction) action.get("run");
+	}
+
+	public Map<String, Action> getMonitor() {
+		return monitor;
+	}
+
+	public void setMonitor(Map<String, Action> monitor) {
+		this.monitor = monitor;
+	}
+
+	public int getStartTimeout() {
+		return startTimeout;
+	}
+
+	public void setStartTimeout(int startTimeout) {
+		this.startTimeout = startTimeout;
 	}
 
 	@Override
 	public String toString() {
 		return "DesiredLRPCreateRequest [processGuid=" + processGuid + ", domain=" + domain + ", rootfs=" + rootfs
 				+ ", instances=" + instances + ", stack=" + stack + ", ports=" + Arrays.toString(ports) + ", routes="
-				+ routes + ", env=" + Arrays.toString(env) + ", memoryMb=" + memoryMb + ", diskMb=" + diskMb
-				+ ", noMonitor=" + noMonitor + ", logGuid=" + logGuid + ", logSource=" + logSource + ", runAction="
-				+ runAction + "]";
+				+ routes + ", env=" + Arrays.toString(env) + ", cpuWeight=" + cpuWeight + ", diskMb=" + diskMb
+				+ ", memoryMb=" + memoryMb + ", privileged=" + privileged + ", noMonitor=" + noMonitor + ", logGuid="
+				+ logGuid + ", metricsGuid=" + metricsGuid + ", logSource=" + logSource + ", setup=" + setup
+				+ ", action=" + action + ", monitor=" + monitor + ", startTimeout=" + startTimeout + "]";
 	}
 
 }

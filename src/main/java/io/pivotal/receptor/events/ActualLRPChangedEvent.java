@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package io.pivotal.receptor.commands;
+package io.pivotal.receptor.events;
 
-import io.pivotal.receptor.support.ModificationTag;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.pivotal.receptor.commands.ActualLRPResponse;
 
 /**
  * @author Mark Fisher
  */
-public class DesiredLRPResponse extends DesiredLRPCreateRequest {
+public class ActualLRPChangedEvent extends ReceptorEvent<ActualLRPResponse> {
 
-	@JsonProperty("modification_tag")
-	private ModificationTag modificationTag;
+	public static final String TYPE = "actual_lrp_changed";
 
-	public ModificationTag getModificationTag() {
-		return modificationTag;
+	public ActualLRPChangedEvent(int id) {
+		super(id, TYPE);
 	}
 
-	public void setModificationTag(ModificationTag modificationTag) {
-		this.modificationTag = modificationTag;
+	public ActualLRPResponse getActualLRPBefore() {
+		return getData().get("actual_lrp_before");
+	}
+
+	public ActualLRPResponse getActualLRPAfter() {
+		return getData().get("actual_lrp_after");
 	}
 }

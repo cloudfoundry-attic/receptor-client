@@ -14,25 +14,43 @@
  * limitations under the License.
  */
 
-package io.pivotal.receptor.commands;
-
-import io.pivotal.receptor.support.ModificationTag;
+package io.pivotal.receptor.actions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Mark Fisher
  */
-public class DesiredLRPResponse extends DesiredLRPCreateRequest {
+public class DownloadAction implements Action {
 
-	@JsonProperty("modification_tag")
-	private ModificationTag modificationTag;
+	private String from;
 
-	public ModificationTag getModificationTag() {
-		return modificationTag;
+	private String to;
+
+	@JsonProperty("cache_key")
+	private String cacheKey;
+
+	public String getFrom() {
+		return from;
 	}
 
-	public void setModificationTag(ModificationTag modificationTag) {
-		this.modificationTag = modificationTag;
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public String getCacheKey() {
+		return cacheKey;
+	}
+
+	public void setCacheKey(String cacheKey) {
+		this.cacheKey = cacheKey;
 	}
 }

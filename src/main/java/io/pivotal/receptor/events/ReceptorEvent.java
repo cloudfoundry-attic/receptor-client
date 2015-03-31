@@ -14,25 +14,44 @@
  * limitations under the License.
  */
 
-package io.pivotal.receptor.commands;
+package io.pivotal.receptor.events;
 
-import io.pivotal.receptor.support.ModificationTag;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 
 /**
  * @author Mark Fisher
  */
-public class DesiredLRPResponse extends DesiredLRPCreateRequest {
+public abstract class ReceptorEvent<T> {
 
-	@JsonProperty("modification_tag")
-	private ModificationTag modificationTag;
+	private final int id;
 
-	public ModificationTag getModificationTag() {
-		return modificationTag;
+	private final String type;
+
+	private Map<String, T> data;
+
+	public ReceptorEvent(int id, String type) {
+		this.id = id;
+		this.type = type;
 	}
 
-	public void setModificationTag(ModificationTag modificationTag) {
-		this.modificationTag = modificationTag;
+	public int getId() {
+		return id;
+	}
+
+	public String getType() {
+		return this.getClass().getSimpleName();
+	}
+
+	public Map<String, T> getData() {
+		return data;
+	}
+
+	public void setData(Map<String, T> data) {
+		this.data = data;
+	}
+
+	@Override
+	public String toString() {
+		return "Event [id=" + id + ", type=" + type + ", data=" + data + "]";
 	}
 }

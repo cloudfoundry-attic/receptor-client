@@ -48,14 +48,14 @@ public class ReceptorClientTests {
 		DesiredLRPCreateRequest request = new DesiredLRPCreateRequest();
 		request.setProcessGuid("test-app");
 		request.setRootfs(APP_DOCKER_PATH);
-		request.runAction.setPath("/lattice-app");
+		request.runAction().setPath("/lattice-app");
 		request.addRoute(8080, new String[] {"test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io"});
 		logger.info("creating LRP: " + objectMapper.writeValueAsString(request));
 		client.createDesiredLRP(request);
 		assertEquals("test-app", client.getDesiredLRPs().get(0).getProcessGuid());
 		assertEquals("test-app", client.getActualLRPs().get(0).getProcessGuid());
 		client.deleteDesiredLRP("test-app");
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			Thread.sleep(100);
 			if (0 == client.getActualLRPsByProcessGuid("test-app").size()) {
 				break;
@@ -78,7 +78,7 @@ public class ReceptorClientTests {
 		client.createTask(request);
 		assertEquals(1, client.getTasks().size());
 		assertEquals("/bin/sh", client.getTask("test-task").getAction().get("run").getPath());
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			String state = client.getTask("test-task").getState();
 			if ("COMPLETED".equals(state)) {
 				break;

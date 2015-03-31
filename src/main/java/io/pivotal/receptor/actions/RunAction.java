@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Mark Fisher
  */
-public class RunAction {
+public class RunAction implements Action {
 
 	private String path;
 
@@ -40,6 +40,9 @@ public class RunAction {
 	private Map<String, String> resourceLimits = new HashMap<String,String>();
 
 	private EnvironmentVariable[] env;
+
+	@JsonProperty("log_source")
+	private String logSource;
 
 	public String getPath() {
 		return path;
@@ -78,9 +81,17 @@ public class RunAction {
 		this.env = env;
 	}
 
+	public String getLogSource() {
+		return logSource;
+	}
+
+	public void setLogSource(String logSource) {
+		this.logSource = logSource;
+	}
+
 	@Override
 	public String toString() {
 		return "RunAction [path=" + path + ", args=" + args + ", dir=" + dir + ", resourceLimits=" + resourceLimits
-				+ ", env=" + Arrays.toString(env) + "]";
+				+ ", env=" + Arrays.toString(env) + ", logSource=" + logSource + "]";
 	}
 }

@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package io.pivotal.receptor.commands;
-
-import io.pivotal.receptor.support.ModificationTag;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package io.pivotal.receptor.events;
 
 /**
  * @author Mark Fisher
  */
-public class DesiredLRPResponse extends DesiredLRPCreateRequest {
+public interface EventListener<E extends ReceptorEvent<?>> {
 
-	@JsonProperty("modification_tag")
-	private ModificationTag modificationTag;
+	void onEvent(E event);
 
-	public ModificationTag getModificationTag() {
-		return modificationTag;
-	}
-
-	public void setModificationTag(ModificationTag modificationTag) {
-		this.modificationTag = modificationTag;
-	}
 }

@@ -18,6 +18,7 @@ package io.pivotal.receptor.commands;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.pivotal.receptor.support.ModificationTag;
 import io.pivotal.receptor.support.Port;
 
 import java.util.Arrays;
@@ -48,6 +49,14 @@ public class ActualLRPResponse {
 	private String state;
 
 	private long since;
+
+	@JsonProperty("crash_count")
+	private int crashCount;
+
+	private boolean evacuating;
+
+	@JsonProperty("modification_tag")
+	private ModificationTag modificationTag;
 
 	public String getProcessGuid() {
 		return processGuid;
@@ -119,6 +128,30 @@ public class ActualLRPResponse {
 
 	public void setSince(long since) {
 		this.since = since;
+	}
+
+	public int getCrashCount() {
+		return crashCount;
+	}
+
+	public void setCrashCount(int crashCount) {
+		this.crashCount = crashCount;
+	}
+
+	public boolean isEvacuating() {
+		return evacuating;
+	}
+
+	public void setEvacuating(boolean evacuating) {
+		this.evacuating = evacuating;
+	}
+
+	public ModificationTag getModificationTag() {
+		return modificationTag;
+	}
+
+	public void setModificationTag(ModificationTag modificationTag) {
+		this.modificationTag = modificationTag;
 	}
 
 	@Override
