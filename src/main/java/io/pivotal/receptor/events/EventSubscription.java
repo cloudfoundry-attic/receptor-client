@@ -101,7 +101,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 									builder = builder.setType(line.split(":", 2)[1].trim());
 								}
 								else if (line.startsWith("data:") && builder != null) {
-									ReceptorEvent<?> event = ((TypedEventBuilder<?>) builder).setData(line.split(":", 2)[1].trim());
+									ReceptorEvent<?> event = ((TypedEventBuilder<?, ?>) builder).setData(line.split(":", 2)[1].trim());
 									if (supportsEventType(listener, event)) {
 										listener.onEvent((E) event);
 									}
@@ -141,7 +141,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 
 		@SuppressWarnings("unchecked")
-		<B extends TypedEventBuilder<?>> B setType(String type) {
+		<B extends TypedEventBuilder<?, ?>> B setType(String type) {
 			switch (type) {
 			case DesiredLRPCreatedEvent.TYPE:
 				return (B) new DesiredLRPCreatedEventBuilder(id);
@@ -162,7 +162,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 	}
 
-	private abstract static class TypedEventBuilder<T extends ReceptorEvent<?>> extends EventBuilder {
+	private abstract static class TypedEventBuilder<E extends ReceptorEvent<D>, D> extends EventBuilder {
 	
 		static final ObjectMapper mapper = new ObjectMapper();
 	
@@ -170,10 +170,11 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 			super(id);
 		}
 	
-		T setData(String data) {
-			T event = createEvent(id);
+		@SuppressWarnings("unchecked")
+		E setData(String data) {
+			E event = createEvent(id);
 			try {
-				event.setData(mapper.readValue(data, getTypeReference()));
+				event.setData((Map<String, D>) mapper.readValue(data, getTypeReference()));
 			}
 			catch (IOException e) {
 				logger.warn("failed to map event data", e);
@@ -181,12 +182,12 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 			return event;
 		}
 
-		abstract T createEvent(int id);
+		abstract E createEvent(int id);
 
 		abstract TypeReference<?> getTypeReference();
 	}
 
-	private static class DesiredLRPCreatedEventBuilder extends TypedEventBuilder<DesiredLRPCreatedEvent> {
+	private static class DesiredLRPCreatedEventBuilder extends TypedEventBuilder<DesiredLRPCreatedEvent, DesiredLRPResponse> {
 	
 		private DesiredLRPCreatedEventBuilder(int id) {
 			super(id);
@@ -203,7 +204,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 	}
 
-	private static class DesiredLRPChangedEventBuilder extends TypedEventBuilder<DesiredLRPChangedEvent> {
+	private static class DesiredLRPChangedEventBuilder extends TypedEventBuilder<DesiredLRPChangedEvent, DesiredLRPResponse> {
 	
 		private DesiredLRPChangedEventBuilder(int id) {
 			super(id);
@@ -219,7 +220,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 	}
 
-	private static class DesiredLRPRemovedEventBuilder extends TypedEventBuilder<DesiredLRPRemovedEvent> {
+	private static class DesiredLRPRemovedEventBuilder extends TypedEventBuilder<DesiredLRPRemovedEvent, DesiredLRPResponse> {
 	
 		private DesiredLRPRemovedEventBuilder(int id) {
 			super(id);
@@ -236,7 +237,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 	}
 	
-	private static class ActualLRPCreatedEventBuilder extends TypedEventBuilder<ActualLRPCreatedEvent> {
+	private static class ActualLRPCreatedEventBuilder extends TypedEventBuilder<ActualLRPCreatedEvent, ActualLRPResponse> {
 	
 		private ActualLRPCreatedEventBuilder(int id) {
 			super(id);
@@ -253,7 +254,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 	}
 	
-	private static class ActualLRPChangedEventBuilder extends TypedEventBuilder<ActualLRPChangedEvent> {
+	private static class ActualLRPChangedEventBuilder extends TypedEventBuilder<ActualLRPChangedEvent, ActualLRPResponse> {
 	
 		private ActualLRPChangedEventBuilder(int id) {
 			super(id);
@@ -270,7 +271,7 @@ public class EventSubscription<E extends ReceptorEvent<?>> implements Runnable {
 		}
 	}
 	
-	private static class ActualLRPRemovedEventBuilder extends TypedEventBuilder<ActualLRPRemovedEvent> {
+	private static class ActualLRPRemovedEventBuilder extends TypedEventBuilder<ActualLRPRemovedEvent, ActualLRPResponse> {
 	
 		private ActualLRPRemovedEventBuilder(int id) {
 			super(id);

@@ -9,8 +9,8 @@ version = '0.0.1-SNAPSHOT'
 jar {
     baseName = 'receptor-client'
 }
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     mavenCentral()

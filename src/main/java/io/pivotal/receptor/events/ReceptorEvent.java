@@ -21,13 +21,13 @@ import java.util.Map;
 /**
  * @author Mark Fisher
  */
-public abstract class ReceptorEvent<T> {
+public abstract class ReceptorEvent<D> {
 
 	private final int id;
 
 	private final String type;
 
-	private Map<String, T> data;
+	private Map<String, D> data;
 
 	public ReceptorEvent(int id, String type) {
 		this.id = id;
@@ -42,11 +42,11 @@ public abstract class ReceptorEvent<T> {
 		return this.getClass().getSimpleName();
 	}
 
-	public Map<String, T> getData() {
+	public Map<String, D> getData() {
 		return data;
 	}
 
-	public void setData(Map<String, T> data) {
+	public void setData(Map<String, D> data) {
 		this.data = data;
 	}
 
