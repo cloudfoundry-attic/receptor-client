@@ -23,13 +23,11 @@ import io.pivotal.receptor.commands.DesiredLRPResponse;
 import io.pivotal.receptor.commands.DesiredLRPUpdateRequest;
 import io.pivotal.receptor.commands.TaskCreateRequest;
 import io.pivotal.receptor.commands.TaskResponse;
+import io.pivotal.receptor.events.EventDispatcher;
 import io.pivotal.receptor.events.EventListener;
-import io.pivotal.receptor.events.EventSubscription;
 import io.pivotal.receptor.events.ReceptorEvent;
 
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -39,6 +37,9 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * Client for the Receptor API exposed by Diego.
+ * For more info, see: <a href="https://github.com/cloudfoundry-incubator/receptor/blob/master/doc/README.md">https://github.com/cloudfoundry-incubator/receptor/blob/master/doc/README.md</a>
+ *
  * @author Mark Fisher
  * @author Matt Stine
  */
@@ -58,7 +59,7 @@ public class ReceptorClient {
 
 	private final RestTemplate restTemplate;
 
-	private final Executor executor = Executors.newCachedThreadPool();
+	private final EventDispatcher eventDispatcher;
 
 	public ReceptorClient() {
 		this(DEFAULT_RECEPTOR_HOST);
@@ -75,6 +76,7 @@ public class ReceptorClient {
 	private ReceptorClient(String receptorHost, RestTemplate restTemplate) {
 		this.baseUrl = (receptorHost.contains("://") ? receptorHost : "http://" + receptorHost) + "/v1";
 		this.restTemplate = restTemplate;
+		this.eventDispatcher = new EventDispatcher(String.format("%s/events", baseUrl));
 	}
 
 	public void createDesiredLRP(DesiredLRPCreateRequest request) {
@@ -170,11 +172,11 @@ public class ReceptorClient {
 	}
 
 	/**
-	 * Temporary implementation that submits each subscription as a Runnable to an Executor.
+	 * Add an {@link EventListener} to be invoked when a {@link ReceptorEvent} occurs.
 	 *
-	 * @param listener the listener to invoke when Events arrive
+	 * @param listener the listener to invoke
 	 */
 	public <E extends ReceptorEvent<?>> void subscribeToEvents(EventListener<E> listener) {
-		executor.execute(new EventSubscription<E>(String.format("%s/events", baseUrl), listener));
+		eventDispatcher.addListener(listener);
 	}
 }
