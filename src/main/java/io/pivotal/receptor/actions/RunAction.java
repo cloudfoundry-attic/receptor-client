@@ -32,14 +32,16 @@ public class RunAction implements Action {
 
 	private String path;
 
+	private String dir;
+
 	private final ArrayList<String> args = new ArrayList<String>();
 
-	private String dir;
+	private EnvironmentVariable[] env;
 
 	@JsonProperty("resource_limits")
 	private Map<String, String> resourceLimits = new HashMap<String,String>();
 
-	private EnvironmentVariable[] env;
+	private boolean privileged;
 
 	@JsonProperty("log_source")
 	private String logSource;
@@ -50,6 +52,14 @@ public class RunAction implements Action {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public String getDir() {
+		return dir;
+	}
+
+	public void setDir(String dir) {
+		this.dir = dir;
 	}
 
 	public String[] getArgs() {
@@ -65,20 +75,28 @@ public class RunAction implements Action {
 		this.args.add(arg);
 	}
 
-	public String getDir() {
-		return dir;
-	}
-
-	public void setDir(String dir) {
-		this.dir = dir;
-	}
-
 	public EnvironmentVariable[] getEnv() {
 		return env;
 	}
 
 	public void setEnv(EnvironmentVariable[] env) {
 		this.env = env;
+	}
+
+	public Map<String, String> getResourceLimits() {
+		return resourceLimits;
+	}
+
+	public void setResourceLimits(Map<String, String> resourceLimits) {
+		this.resourceLimits = resourceLimits;
+	}
+
+	public boolean isPrivileged() {
+		return privileged;
+	}
+
+	public void setPrivileged(boolean privileged) {
+		this.privileged = privileged;
 	}
 
 	public String getLogSource() {

@@ -21,16 +21,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Mark Fisher
  */
-public class DownloadAction implements Action {
+public class UploadAction implements Action {
 
 	private String artifact;
 
-	private String from;
-
 	private String to;
 
-	@JsonProperty("cache_key")
-	private String cacheKey;
+	private String from;
 
 	@JsonProperty("log_source")
 	private String logSource;
@@ -43,14 +40,6 @@ public class DownloadAction implements Action {
 		this.artifact = artifact;
 	}
 
-	public String getFrom() {
-		return from;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
 	public String getTo() {
 		return to;
 	}
@@ -59,12 +48,12 @@ public class DownloadAction implements Action {
 		this.to = to;
 	}
 
-	public String getCacheKey() {
-		return cacheKey;
+	public String getFrom() {
+		return from;
 	}
 
-	public void setCacheKey(String cacheKey) {
-		this.cacheKey = cacheKey;
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
 	public String getLogSource() {

@@ -17,6 +17,7 @@
 package io.pivotal.receptor.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import io.pivotal.receptor.commands.CellResponse;
 import io.pivotal.receptor.commands.DesiredLRPCreateRequest;
@@ -54,6 +55,9 @@ public class ReceptorClientTests {
 		client.createDesiredLRP(request);
 		assertEquals("test-app", client.getDesiredLRPs().get(0).getProcessGuid());
 		assertEquals("test-app", client.getActualLRPs().get(0).getProcessGuid());
+		String[] domains = client.getDomains();
+		assertEquals(1, domains.length);
+		assertEquals("lattice", domains[0]);
 		client.deleteDesiredLRP("test-app");
 		for (int i = 0; i < 1000; i++) {
 			Thread.sleep(100);
@@ -122,8 +126,7 @@ public class ReceptorClientTests {
 	@Test
 	public void getDomains() {
 		String[] domains = client.getDomains();
-		assertEquals(1, domains.length);
-		assertEquals("lattice", domains[0]);
+		assertNotNull(domains);
 	}
 
 	@Test

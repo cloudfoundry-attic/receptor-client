@@ -19,6 +19,7 @@ package io.pivotal.receptor.commands;
 import io.pivotal.receptor.actions.Action;
 import io.pivotal.receptor.actions.DownloadAction;
 import io.pivotal.receptor.actions.RunAction;
+import io.pivotal.receptor.actions.UploadAction;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,18 +40,28 @@ public class ActionMapSerializer extends JsonDeserializer<Map<String, Action>> {
 
 	private static final String DOWNLOAD_KEY = "download";
 
+	private static final String UPLOAD_KEY = "upload";
+
 	private static final String RUN_KEY = "run";
 
 	@Override
 	public Map<String, Action> deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
+		ObjectCodec codec = parser.getCodec();
 		Map<String, Action> map = new HashMap<String, Action>();
-		final JsonNode node = parser.getCodec().readTree(parser);
+		final JsonNode node = codec.readTree(parser);
 		if (node.has(DOWNLOAD_KEY)) {
-			map.put(DOWNLOAD_KEY, ((ObjectNode) node.get(DOWNLOAD_KEY)).traverse(parser.getCodec()).readValueAs(DownloadAction.class));
+			map.put(DOWNLOAD_KEY, deserializeAction(node, DOWNLOAD_KEY, codec, DownloadAction.class));
+		}
+		if (node.has(UPLOAD_KEY)) {
+			map.put(UPLOAD_KEY, deserializeAction(node, UPLOAD_KEY, codec, UploadAction.class)); 
 		}
 		if (node.has(RUN_KEY)) {
-			map.put(RUN_KEY, ((ObjectNode) node.get(RUN_KEY)).traverse(parser.getCodec()).readValueAs(RunAction.class));
+			map.put(RUN_KEY, deserializeAction(node, RUN_KEY, codec, RunAction.class));
 		}
 		return (map.size() == 0) ? null : map;
+	}
+
+	private Action deserializeAction(JsonNode node, String key, ObjectCodec codec, Class<? extends Action> type) throws IOException {
+		return ((ObjectNode) node.get(key)).traverse(codec).readValueAs(type);
 	}
 }
