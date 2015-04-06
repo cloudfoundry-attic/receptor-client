@@ -43,7 +43,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Mark Fisher
  * @author Matt Stine
  */
-public class ReceptorClient {
+public class ReceptorClient implements ReceptorOperations {
 
 	private static final String DEFAULT_RECEPTOR_HOST = "receptor.192.168.11.11.xip.io";
 
@@ -79,85 +79,154 @@ public class ReceptorClient {
 		this.eventDispatcher = new EventDispatcher(String.format("%s/events", baseUrl));
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#createDesiredLRP(io.pivotal.receptor.commands.DesiredLRPCreateRequest)
+	 */
+	@Override
 	public void createDesiredLRP(DesiredLRPCreateRequest request) {
 		restTemplate.postForEntity("{baseUrl}/desired_lrps", request, null, baseUrl);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getDesiredLRP(java.lang.String)
+	 */
+	@Override
 	public DesiredLRPResponse getDesiredLRP(String processGuid) {
 		return restTemplate.exchange("{baseUrl}/desired_lrps/{processGuid}", HttpMethod.GET, null, DesiredLRPResponse.class, baseUrl, processGuid).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getDesiredLRPs()
+	 */
+	@Override
 	public List<DesiredLRPResponse> getDesiredLRPs() {
 		return restTemplate.exchange("{baseUrl}/desired_lrps", HttpMethod.GET, null, DESIRED_LRP_RESPONSE_LIST_TYPE, baseUrl).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getDesiredLRPsByDomain(java.lang.String)
+	 */
+	@Override
 	public List<DesiredLRPResponse> getDesiredLRPsByDomain(String domain) {
 		return restTemplate.exchange("{baseUrl}/desired_lrps?domain={domain}", HttpMethod.GET, null, DESIRED_LRP_RESPONSE_LIST_TYPE, baseUrl, domain).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#updateDesiredLRP(java.lang.String, io.pivotal.receptor.commands.DesiredLRPUpdateRequest)
+	 */
+	@Override
 	public void updateDesiredLRP(String processGuid, DesiredLRPUpdateRequest request) {
 		restTemplate.put("{baseUrl}/desired_lrps/{processGuid}", request, baseUrl, processGuid);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#deleteDesiredLRP(java.lang.String)
+	 */
+	@Override
 	public void deleteDesiredLRP(String processGuid) {
 		restTemplate.delete("{baseUrl}/desired_lrps/{processGuid}", baseUrl, processGuid);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getActualLRPs()
+	 */
+	@Override
 	public List<ActualLRPResponse> getActualLRPs() {
 		return restTemplate.exchange("{baseUrl}/actual_lrps", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl).getBody();		
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getActualLRPsByDomain(java.lang.String)
+	 */
+	@Override
 	public List<ActualLRPResponse> getActualLRPsByDomain(String domain) {
 		return restTemplate.exchange("{baseUrl}/actual_lrps?domain={domain}", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl, domain).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getActualLRPsByProcessGuid(java.lang.String)
+	 */
+	@Override
 	public List<ActualLRPResponse> getActualLRPsByProcessGuid(String processGuid) {
 		return restTemplate.exchange("{baseUrl}/actual_lrps/{processGuid}", HttpMethod.GET, null, ACTUAL_LRP_RESPONSE_LIST_TYPE, baseUrl, processGuid).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getActualLRPByProcessGuidAndIndex(java.lang.String, int)
+	 */
+	@Override
 	public ActualLRPResponse getActualLRPByProcessGuidAndIndex(String processGuid, int index) {
 		return restTemplate.exchange("{baseUrl}/actual_lrps/{processGuid}/index/{index}", HttpMethod.GET, null, ActualLRPResponse.class, baseUrl, processGuid, index).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#killActualLRPByProcessGuidAndIndex(java.lang.String, int)
+	 */
+	@Override
 	public void killActualLRPByProcessGuidAndIndex(String processGuid, int index) {
 		restTemplate.delete("{baseUrl}/actual_lrps/{processGuid}/index/{index}", baseUrl, processGuid, index);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#createTask(io.pivotal.receptor.commands.TaskCreateRequest)
+	 */
+	@Override
 	public void createTask(TaskCreateRequest request) {
 		restTemplate.postForEntity("{baseUrl}/tasks", request, null, baseUrl);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getTasks()
+	 */
+	@Override
 	public List<TaskResponse> getTasks() {
 		return restTemplate.exchange("{baseUrl}/tasks", HttpMethod.GET, null, TASK_RESPONSE_LIST_TYPE, baseUrl).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getTasksByDomain(java.lang.String)
+	 */
+	@Override
 	public List<TaskResponse> getTasksByDomain(String domain) {
 		return restTemplate.exchange("{baseUrl}/tasks?domain={domain}", HttpMethod.GET, null, TASK_RESPONSE_LIST_TYPE, baseUrl, domain).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getTask(java.lang.String)
+	 */
+	@Override
 	public TaskResponse getTask(String taskGuid) {
 		return restTemplate.exchange("{baseUrl}/tasks/{taskGuid}", HttpMethod.GET, null, TaskResponse.class, baseUrl, taskGuid).getBody();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#deleteTask(java.lang.String)
+	 */
+	@Override
 	public void deleteTask(String taskGuid) {
 		restTemplate.delete("{baseUrl}/tasks/{taskGuid}", baseUrl, taskGuid);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#cancelTask(java.lang.String)
+	 */
+	@Override
 	public void cancelTask(String taskGuid) {
 		restTemplate.postForEntity("{baseUrl}/tasks/{taskGuid}/cancel", "", null, baseUrl, taskGuid);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getCells()
+	 */
+	@Override
 	public List<CellResponse> getCells() {
 		return restTemplate.exchange("{baseUrl}/cells", HttpMethod.GET, null, CELL_RESPONSE_LIST_TYPE, baseUrl).getBody();
 	}
 
-	/**
-	 * Mark a domain as fresh for ttl seconds. A value of 0 indicates never expire.
-	 * If a non-zero value is provided, this request must be repeated before the ttl expires.
-	 *
-	 * @param domain domain to keep fresh
-	 * @param ttl number of seconds to keep fresh, or 0 for never expire
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#upsertDomain(java.lang.String, int)
 	 */
+	@Override
 	public void upsertDomain(String domain, int ttl) {
 		HttpHeaders headers = new HttpHeaders();
 		if (ttl != 0) {
@@ -167,15 +236,18 @@ public class ReceptorClient {
 		restTemplate.put("{baseUrl}/domains/{domain}", request, baseUrl, domain);
 	}
 
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#getDomains()
+	 */
+	@Override
 	public String[] getDomains() {
 		return restTemplate.exchange("{baseUrl}/domains", HttpMethod.GET, null, String[].class, baseUrl).getBody();
 	}
 
-	/**
-	 * Add an {@link EventListener} to be invoked when a {@link ReceptorEvent} occurs.
-	 *
-	 * @param listener the listener to invoke
+	/* (non-Javadoc)
+	 * @see io.pivotal.receptor.client.ReceptorOperations#subscribeToEvents(io.pivotal.receptor.events.EventListener)
 	 */
+	@Override
 	public <E extends ReceptorEvent<?>> void subscribeToEvents(EventListener<E> listener) {
 		eventDispatcher.addListener(listener);
 	}

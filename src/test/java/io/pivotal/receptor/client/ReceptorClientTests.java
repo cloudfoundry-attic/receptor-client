@@ -42,7 +42,7 @@ public class ReceptorClientTests {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-	private final ReceptorClient client = new ReceptorClient();
+	private final ReceptorOperations client = new ReceptorClient();
 
 	@Test
 	public void createAndDeleteLRP() throws Exception {
