@@ -244,7 +244,9 @@ public class DesiredLRPCreateRequest {
 
 	@JsonIgnore
 	public RunAction runAction() {
-		action.putIfAbsent("run", new RunAction());
+		if (action.get("run") == null) {
+			action.put("run", new RunAction());
+		}
 		return (RunAction) action.get("run");
 	}
 
