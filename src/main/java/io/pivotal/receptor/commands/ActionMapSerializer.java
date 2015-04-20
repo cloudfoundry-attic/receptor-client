@@ -16,22 +16,19 @@
 
 package io.pivotal.receptor.commands;
 
-import io.pivotal.receptor.actions.Action;
-import io.pivotal.receptor.actions.DownloadAction;
-import io.pivotal.receptor.actions.RunAction;
-import io.pivotal.receptor.actions.UploadAction;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.pivotal.receptor.actions.Action;
+import io.pivotal.receptor.actions.DownloadAction;
+import io.pivotal.receptor.actions.RunAction;
+import io.pivotal.receptor.actions.UploadAction;
 
 /**
  * @author Mark Fisher
@@ -45,9 +42,9 @@ public class ActionMapSerializer extends JsonDeserializer<Map<String, Action>> {
 	private static final String RUN_KEY = "run";
 
 	@Override
-	public Map<String, Action> deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
+	public Map<String, Action> deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 		ObjectCodec codec = parser.getCodec();
-		Map<String, Action> map = new HashMap<String, Action>();
+		Map<String, Action> map = new HashMap<>();
 		final JsonNode node = codec.readTree(parser);
 		if (node.has(DOWNLOAD_KEY)) {
 			map.put(DOWNLOAD_KEY, deserializeAction(node, DOWNLOAD_KEY, codec, DownloadAction.class));
@@ -62,6 +59,6 @@ public class ActionMapSerializer extends JsonDeserializer<Map<String, Action>> {
 	}
 
 	private Action deserializeAction(JsonNode node, String key, ObjectCodec codec, Class<? extends Action> type) throws IOException {
-		return ((ObjectNode) node.get(key)).traverse(codec).readValueAs(type);
+		return (node.get(key)).traverse(codec).readValueAs(type);
 	}
 }

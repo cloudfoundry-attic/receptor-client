@@ -16,6 +16,8 @@
 
 package io.pivotal.receptor.client;
 
+import java.util.List;
+
 import io.pivotal.receptor.commands.ActualLRPResponse;
 import io.pivotal.receptor.commands.CellResponse;
 import io.pivotal.receptor.commands.DesiredLRPCreateRequest;
@@ -26,8 +28,6 @@ import io.pivotal.receptor.commands.TaskResponse;
 import io.pivotal.receptor.events.EventDispatcher;
 import io.pivotal.receptor.events.EventListener;
 import io.pivotal.receptor.events.ReceptorEvent;
-
-import java.util.List;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -232,7 +232,7 @@ public class ReceptorClient implements ReceptorOperations {
 		if (ttl != 0) {
 			headers.setCacheControl(String.format("max-age=%d", ttl));
 		}		
-		HttpEntity<String> request = new HttpEntity<String>(headers);
+		HttpEntity<String> request = new HttpEntity<>(headers);
 		restTemplate.put("{baseUrl}/domains/{domain}", request, baseUrl, domain);
 	}
 

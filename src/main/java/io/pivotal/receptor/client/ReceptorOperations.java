@@ -16,6 +16,8 @@
 
 package io.pivotal.receptor.client;
 
+import java.util.List;
+
 import io.pivotal.receptor.commands.ActualLRPResponse;
 import io.pivotal.receptor.commands.CellResponse;
 import io.pivotal.receptor.commands.DesiredLRPCreateRequest;
@@ -26,48 +28,48 @@ import io.pivotal.receptor.commands.TaskResponse;
 import io.pivotal.receptor.events.EventListener;
 import io.pivotal.receptor.events.ReceptorEvent;
 
-import java.util.List;
-
 /**
+ * Definition of available operations for interacting with the Receptor API.
+ *
  * @author Mark Fisher
  */
 public interface ReceptorOperations {
 
-	public abstract void createDesiredLRP(DesiredLRPCreateRequest request);
+	void createDesiredLRP(DesiredLRPCreateRequest request);
 
-	public abstract DesiredLRPResponse getDesiredLRP(String processGuid);
+	DesiredLRPResponse getDesiredLRP(String processGuid);
 
-	public abstract List<DesiredLRPResponse> getDesiredLRPs();
+	List<DesiredLRPResponse> getDesiredLRPs();
 
-	public abstract List<DesiredLRPResponse> getDesiredLRPsByDomain(String domain);
+	List<DesiredLRPResponse> getDesiredLRPsByDomain(String domain);
 
-	public abstract void updateDesiredLRP(String processGuid, DesiredLRPUpdateRequest request);
+	void updateDesiredLRP(String processGuid, DesiredLRPUpdateRequest request);
 
-	public abstract void deleteDesiredLRP(String processGuid);
+	void deleteDesiredLRP(String processGuid);
 
-	public abstract List<ActualLRPResponse> getActualLRPs();
+	List<ActualLRPResponse> getActualLRPs();
 
-	public abstract List<ActualLRPResponse> getActualLRPsByDomain(String domain);
+	List<ActualLRPResponse> getActualLRPsByDomain(String domain);
 
-	public abstract List<ActualLRPResponse> getActualLRPsByProcessGuid(String processGuid);
+	List<ActualLRPResponse> getActualLRPsByProcessGuid(String processGuid);
 
-	public abstract ActualLRPResponse getActualLRPByProcessGuidAndIndex(String processGuid, int index);
+	ActualLRPResponse getActualLRPByProcessGuidAndIndex(String processGuid, int index);
 
-	public abstract void killActualLRPByProcessGuidAndIndex(String processGuid, int index);
+	void killActualLRPByProcessGuidAndIndex(String processGuid, int index);
 
-	public abstract void createTask(TaskCreateRequest request);
+	void createTask(TaskCreateRequest request);
 
-	public abstract List<TaskResponse> getTasks();
+	List<TaskResponse> getTasks();
 
-	public abstract List<TaskResponse> getTasksByDomain(String domain);
+	List<TaskResponse> getTasksByDomain(String domain);
 
-	public abstract TaskResponse getTask(String taskGuid);
+	TaskResponse getTask(String taskGuid);
 
-	public abstract void deleteTask(String taskGuid);
+	void deleteTask(String taskGuid);
 
-	public abstract void cancelTask(String taskGuid);
+	void cancelTask(String taskGuid);
 
-	public abstract List<CellResponse> getCells();
+	List<CellResponse> getCells();
 
 	/**
 	 * Mark a domain as fresh for a number of seconds. A value of 0 indicates never expire.
@@ -77,15 +79,15 @@ public interface ReceptorOperations {
 	 * @param domain name of domain to keep fresh
 	 * @param ttl number of seconds to keep fresh, or 0 to never expire
 	 */
-	public abstract void upsertDomain(String domain, int ttl);
+	void upsertDomain(String domain, int ttl);
 
-	public abstract String[] getDomains();
+	String[] getDomains();
 
 	/**
 	 * Add an {@link EventListener} to be invoked when a {@link ReceptorEvent} occurs.
 	 *
 	 * @param listener the listener to invoke
 	 */
-	public abstract <E extends ReceptorEvent<?>> void subscribeToEvents(EventListener<E> listener);
+	<E extends ReceptorEvent<?>> void subscribeToEvents(EventListener<E> listener);
 
 }
