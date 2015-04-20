@@ -59,6 +59,6 @@ public class ActionMapSerializer extends JsonDeserializer<Map<String, Action>> {
 	}
 
 	private Action deserializeAction(JsonNode node, String key, ObjectCodec codec, Class<? extends Action> type) throws IOException {
-		return (node.get(key)).traverse(codec).readValueAs(type);
+		return node.get(key).traverse(codec).readValueAs(type);
 	}
 }
