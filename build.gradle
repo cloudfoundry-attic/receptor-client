@@ -19,7 +19,23 @@ repositories {
 dependencies {
 	compile("com.fasterxml.jackson.core:jackson-databind:2.5.1")
 	compile("org.springframework:spring-web:4.1.5.RELEASE")
+    testCompile('org.mockito:mockito-core:1.9.5')
 	testCompile("junit:junit:4.12")
+}
+
+test {
+    useJUnit {
+        excludeCategories 'io.pivotal.receptor.client.test.IntegrationTest'
+    }
+}
+
+task integrationTest(type: Test, dependsOn: test) {
+    description 'Runs all integration tests'
+    group = "Verification"
+
+    useJUnit {
+        includeCategories 'io.pivotal.receptor.client.IntegrationTest'
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

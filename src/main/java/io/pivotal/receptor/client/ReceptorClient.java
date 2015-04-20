@@ -34,6 +34,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -47,17 +48,17 @@ public class ReceptorClient implements ReceptorOperations {
 
 	private static final String DEFAULT_RECEPTOR_HOST = "receptor.192.168.11.11.xip.io";
 
-	private static final ParameterizedTypeReference<List<DesiredLRPResponse>> DESIRED_LRP_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<DesiredLRPResponse>>(){};
+	protected static final ParameterizedTypeReference<List<DesiredLRPResponse>> DESIRED_LRP_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<DesiredLRPResponse>>(){};
 
-	private static final ParameterizedTypeReference<List<ActualLRPResponse>> ACTUAL_LRP_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<ActualLRPResponse>>(){};
+	protected static final ParameterizedTypeReference<List<ActualLRPResponse>> ACTUAL_LRP_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<ActualLRPResponse>>(){};
 
-	private static final ParameterizedTypeReference<List<TaskResponse>> TASK_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<TaskResponse>>(){};
+	protected static final ParameterizedTypeReference<List<TaskResponse>> TASK_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<TaskResponse>>(){};
 
-	private static final ParameterizedTypeReference<List<CellResponse>> CELL_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<CellResponse>>(){};
+	protected static final ParameterizedTypeReference<List<CellResponse>> CELL_RESPONSE_LIST_TYPE = new ParameterizedTypeReference<List<CellResponse>>(){};
 
 	private final String baseUrl;
 
-	private final RestTemplate restTemplate;
+	private final RestOperations restTemplate;
 
 	private final EventDispatcher eventDispatcher;
 
@@ -73,7 +74,7 @@ public class ReceptorClient implements ReceptorOperations {
 		this(receptorHost, new RestTemplate(factory));
 	}
 
-	private ReceptorClient(String receptorHost, RestTemplate restTemplate) {
+	protected ReceptorClient(String receptorHost, RestOperations restTemplate) {
 		this.baseUrl = (receptorHost.contains("://") ? receptorHost : "http://" + receptorHost) + "/v1";
 		this.restTemplate = restTemplate;
 		this.eventDispatcher = new EventDispatcher(String.format("%s/events", baseUrl));
