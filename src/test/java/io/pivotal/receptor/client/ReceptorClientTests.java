@@ -18,20 +18,11 @@ package io.pivotal.receptor.client;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.isNull;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pivotal.receptor.actions.RunAction;
 import io.pivotal.receptor.commands.ActualLRPResponse;
 import io.pivotal.receptor.commands.CellResponse;
@@ -40,8 +31,14 @@ import io.pivotal.receptor.commands.DesiredLRPResponse;
 import io.pivotal.receptor.commands.DesiredLRPUpdateRequest;
 import io.pivotal.receptor.commands.TaskCreateRequest;
 import io.pivotal.receptor.commands.TaskResponse;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -57,14 +54,10 @@ import org.springframework.web.client.RestOperations;
 /**
  * @author Michael Minella
  */
-//@Category(UnitTest.class)
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ReceptorClientTests {
 
-	private static final Log logger = LogFactory.getLog(ReceptorClientTests.class);
-
 	private static final String APP_DOCKER_PATH = "docker:///cloudfoundry/lattice-app";
-
-	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	public static final String BASE_URL = "http://localhost/v1";
 
@@ -82,7 +75,7 @@ public class ReceptorClientTests {
 
 	@Test
 	public void testCreateDesiredLRP() throws Exception {
-		ArgumentCaptor requestCaptor = ArgumentCaptor.forClass(DesiredLRPCreateRequest.class);
+		ArgumentCaptor<DesiredLRPCreateRequest> requestCaptor = ArgumentCaptor.forClass(DesiredLRPCreateRequest.class);
 
 		DesiredLRPCreateRequest request = getDesiredLRPCreateRequest();
 
@@ -354,7 +347,7 @@ public class ReceptorClientTests {
 
 	@Test
 	public void testUpsertDomain() {
-		ArgumentCaptor httpEntityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+		ArgumentCaptor<HttpEntity> httpEntityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
 		receptorClient.upsertDomain("foo", 123);
 
