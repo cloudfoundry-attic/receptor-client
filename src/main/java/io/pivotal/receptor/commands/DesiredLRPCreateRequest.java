@@ -100,6 +100,10 @@ public class DesiredLRPCreateRequest {
 
 	public void setProcessGuid(String processGuid) {
 		this.processGuid = processGuid;
+		if (this.env.length == 1) {
+			this.env = Arrays.copyOf(env, 2);
+		}
+		this.env[1] = new EnvironmentVariable("PROCESS_GUID", processGuid);
 	}
 
 	public String getDomain() {
