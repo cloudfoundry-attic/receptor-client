@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-group = 'io.pivotal.receptor'
+group = 'org.cloudfoundry.receptor'
 version = '0.0.1-SNAPSHOT'
 
 jar {
@@ -25,7 +25,7 @@ dependencies {
 
 test {
     useJUnit {
-        excludeCategories 'io.pivotal.receptor.client.test.IntegrationTest'
+        excludeCategories 'org.cloudfoundry.receptor.client.test.IntegrationTest'
     }
 }
 
@@ -34,7 +34,7 @@ task integrationTest(type: Test, dependsOn: test) {
     group = "Verification"
 
     useJUnit {
-        includeCategories 'io.pivotal.receptor.client.IntegrationTest'
+        includeCategories 'org.cloudfoundry.receptor.client.IntegrationTest'
     }
 }
 
