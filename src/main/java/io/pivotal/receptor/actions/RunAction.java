@@ -34,6 +34,8 @@ public class RunAction implements Action {
 
 	private String dir;
 
+	private String user = "vcap";
+
 	private final ArrayList<String> args = new ArrayList<String>();
 
 	private EnvironmentVariable[] env;
@@ -60,6 +62,14 @@ public class RunAction implements Action {
 
 	public void setDir(String dir) {
 		this.dir = dir;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
 	}
 
 	public String[] getArgs() {
