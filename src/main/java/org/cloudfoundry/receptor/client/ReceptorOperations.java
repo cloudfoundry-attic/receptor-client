@@ -87,6 +87,7 @@ public interface ReceptorOperations {
 	 * Add an {@link EventListener} to be invoked when a {@link ReceptorEvent} occurs.
 	 *
 	 * @param listener the listener to invoke
+	 * @param <E> ReceptorEvent type expected by the listener
 	 */
 	<E extends ReceptorEvent<?>> void subscribeToEvents(EventListener<E> listener);
 
