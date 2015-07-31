@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
@@ -51,6 +52,32 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username '<user>'     //TODO: get from env var
+                password '<password>' //TODO: get from env var
+            }
+            url "http://repo.spring.io/libs-snapshot-local" //TODO: get from env var
+        }
+    }
+
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+    }
 }
 
 eclipse {
