@@ -16,23 +16,9 @@
 
 package org.cloudfoundry.receptor.commands;
 
-import org.cloudfoundry.receptor.support.ModificationTag;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author Mark Fisher
  */
 public class DesiredLRPResponse extends DesiredLRPCreateRequest {
 
-	@JsonProperty("modification_tag")
-	private ModificationTag modificationTag;
-
-	public ModificationTag getModificationTag() {
-		return modificationTag;
-	}
-
-	public void setModificationTag(ModificationTag modificationTag) {
-		this.modificationTag = modificationTag;
-	}
 }

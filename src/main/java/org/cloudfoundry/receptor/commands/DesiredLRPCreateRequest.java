@@ -22,8 +22,11 @@ import java.util.Map;
 
 import org.cloudfoundry.receptor.actions.Action;
 import org.cloudfoundry.receptor.actions.RunAction;
+import org.cloudfoundry.receptor.support.EgressRule;
 import org.cloudfoundry.receptor.support.EnvironmentVariable;
+import org.cloudfoundry.receptor.support.ModificationTag;
 import org.cloudfoundry.receptor.support.Route;
+
 import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,19 +45,11 @@ public class DesiredLRPCreateRequest {
 
 	private String domain = "lattice";
 
-	private String rootfs;
-
 	private int instances = 1;
 
-	private String stack = "lucid64";
+	private String rootfs;
 
-	private int[] ports = new int[] { 8080 };
-
-	private Map<String, Route[]> routes = new HashMap<String, Route[]>();
-
-	private EnvironmentVariable[] env = new EnvironmentVariable[] {
-		new EnvironmentVariable("PORT", "8080")
-	};
+	private EnvironmentVariable[] env = new EnvironmentVariable[] { new EnvironmentVariable("PORT", "8080") };
 
 	@JsonProperty("cpu_weight")
 	private int cpuWeight;
@@ -66,18 +61,6 @@ public class DesiredLRPCreateRequest {
 	private int memoryMb = 128;
 
 	private boolean privileged;
-
-	@JsonProperty("no_monitor")
-	private boolean noMonitor = false;
-
-	@JsonProperty("log_guid")
-	private String logGuid;
-
-	@JsonProperty("metrics_guid")
-	private String metricsGuid;
-
-	@JsonProperty("log_source")
-	private String logSource = "APP";
 
 	@JsonInclude(Include.NON_EMPTY)
 	@JsonDeserialize(using = ActionMapSerializer.class)
@@ -92,6 +75,27 @@ public class DesiredLRPCreateRequest {
 
 	@JsonProperty("start_timeout")
 	private int startTimeout;
+
+	private int[] ports = new int[] { 8080 };
+
+	private Map<String, Route[]> routes = new HashMap<String, Route[]>();
+
+	@JsonProperty("log_guid")
+	private String logGuid;
+
+	@JsonProperty("log_source")
+	private String logSource = "APP";
+
+	@JsonProperty("metrics_guid")
+	private String metricsGuid;
+
+	private String annotation;
+
+	@JsonProperty("egress_rules")
+	private EgressRule[] egressRules = new EgressRule[] {};
+
+	@JsonProperty("modification_tag")
+	private ModificationTag modificationTag;
 
 	public String getProcessGuid() {
 		return processGuid;
@@ -113,14 +117,6 @@ public class DesiredLRPCreateRequest {
 		this.domain = domain;
 	}
 
-	public String getRootfs() {
-		return rootfs;
-	}
-
-	public void setRootfs(String rootfs) {
-		this.rootfs = rootfs;
-	}
-
 	public int getInstances() {
 		return instances;
 	}
@@ -129,56 +125,20 @@ public class DesiredLRPCreateRequest {
 		this.instances = instances;
 	}
 
-	public String getStack() {
-		return stack;
+	public String getRootfs() {
+		return rootfs;
 	}
 
-	public void setStack(String stack) {
-		this.stack = stack;
-	}
-
-	public int[] getPorts() {
-		return ports;
-	}
-
-	public void setPorts(int[] ports) {
-		this.ports = ports;
-	}
-
-	public Map<String, Route[]> getRoutes() {
-		return routes;
-	}
-
-	public void setRoutes(Map<String, Route[]> routes) {
-		this.routes = routes;
-	}
-
-	public void addRoute(int port, String... hostnames) {
-		this.routes.put("cf-router", ObjectUtils.addObjectToArray(this.routes.get("cf-router"), new Route(port, hostnames)));
-	}
-
-	public void setEnv(EnvironmentVariable[] env) {
-		this.env = env;
+	public void setRootfs(String rootfs) {
+		this.rootfs = rootfs;
 	}
 
 	public EnvironmentVariable[] getEnv() {
 		return env;
 	}
 
-	public int getMemoryMb() {
-		return memoryMb;
-	}
-
-	public void setMemoryMb(int memoryMb) {
-		this.memoryMb = memoryMb;
-	}
-
-	public int getDiskMb() {
-		return diskMb;
-	}
-
-	public void setDiskMb(int diskMb) {
-		this.diskMb = diskMb;
+	public void setEnv(EnvironmentVariable[] env) {
+		this.env = env;
 	}
 
 	public int getCpuWeight() {
@@ -189,44 +149,28 @@ public class DesiredLRPCreateRequest {
 		this.cpuWeight = cpuWeight;
 	}
 
+	public int getDiskMb() {
+		return diskMb;
+	}
+
+	public void setDiskMb(int diskMb) {
+		this.diskMb = diskMb;
+	}
+
+	public int getMemoryMb() {
+		return memoryMb;
+	}
+
+	public void setMemoryMb(int memoryMb) {
+		this.memoryMb = memoryMb;
+	}
+
 	public boolean isPrivileged() {
 		return privileged;
 	}
 
 	public void setPriviliged(boolean priviliged) {
 		this.privileged = priviliged;
-	}
-
-	public boolean isNoMonitor() {
-		return noMonitor;
-	}
-
-	public void setNoMonitor(boolean noMonitor) {
-		this.noMonitor = noMonitor;
-	}
-
-	public String getLogGuid() {
-		return (logGuid == null ? processGuid : logGuid);
-	}
-
-	public void setLogGuid(String logGuid) {
-		this.logGuid = logGuid;
-	}
-
-	public String getLogSource() {
-		return logSource;
-	}
-
-	public void setLogSource(String logSource) {
-		this.logSource = logSource;
-	}
-
-	public String getMetricsGuid() {
-		return metricsGuid;
-	}
-
-	public void setMetricsGuid(String metricsGuid) {
-		this.metricsGuid = metricsGuid;
 	}
 
 	public Map<String, Action> getSetup() {
@@ -269,14 +213,87 @@ public class DesiredLRPCreateRequest {
 		this.startTimeout = startTimeout;
 	}
 
-	@Override
-	public String toString() {
-		return "DesiredLRPCreateRequest [processGuid=" + processGuid + ", domain=" + domain + ", rootfs=" + rootfs
-				+ ", instances=" + instances + ", stack=" + stack + ", ports=" + Arrays.toString(ports) + ", routes="
-				+ routes + ", env=" + Arrays.toString(env) + ", cpuWeight=" + cpuWeight + ", diskMb=" + diskMb
-				+ ", memoryMb=" + memoryMb + ", privileged=" + privileged + ", noMonitor=" + noMonitor + ", logGuid="
-				+ logGuid + ", metricsGuid=" + metricsGuid + ", logSource=" + logSource + ", setup=" + setup
-				+ ", action=" + action + ", monitor=" + monitor + ", startTimeout=" + startTimeout + "]";
+	public int[] getPorts() {
+		return ports;
 	}
 
+	public void setPorts(int[] ports) {
+		this.ports = ports;
+	}
+
+	public Map<String, Route[]> getRoutes() {
+		return routes;
+	}
+
+	public void setRoutes(Map<String, Route[]> routes) {
+		this.routes = routes;
+	}
+
+	public void addRoute(int port, String... hostnames) {
+		this.routes.put("cf-router", ObjectUtils.addObjectToArray(this.routes.get("cf-router"), new Route(port, hostnames)));
+	}
+
+	public String getLogGuid() {
+		return (logGuid == null ? processGuid : logGuid);
+	}
+
+	public void setLogGuid(String logGuid) {
+		this.logGuid = logGuid;
+	}
+
+	public String getLogSource() {
+		return logSource;
+	}
+
+	public void setLogSource(String logSource) {
+		this.logSource = logSource;
+	}
+
+	public String getMetricsGuid() {
+		return metricsGuid;
+	}
+
+	public void setMetricsGuid(String metricsGuid) {
+		this.metricsGuid = metricsGuid;
+	}
+
+	public String getAnnotation() {
+		return annotation;
+	}
+
+	public void setAnnotation(String annotation) {
+		this.annotation = annotation;
+	}
+
+	public EgressRule[] getEgressRules() {
+		return egressRules;
+	}
+
+	public void setEgressRules(EgressRule[] egressRules) {
+		this.egressRules = egressRules;
+	}
+
+	public ModificationTag getModificationTag() {
+		return modificationTag;
+	}
+
+	public void setModificationTag(ModificationTag modificationTag) {
+		this.modificationTag = modificationTag;
+	}
+
+	@Override
+	public String toString() {
+		return "DesiredLRPCreateRequest [processGuid=" + processGuid
+				+ ", domain=" + domain + ", instances=" + instances
+				+ ", rootfs=" + rootfs + ", env=" + Arrays.toString(env)
+				+ ", cpuWeight=" + cpuWeight + ", diskMb=" + diskMb
+				+ ", memoryMb=" + memoryMb + ", privileged=" + privileged
+				+ ", setup=" + setup + ", action=" + action + ", monitor="
+				+ monitor + ", startTimeout=" + startTimeout + ", ports="
+				+ Arrays.toString(ports) + ", routes=" + routes + ", logGuid="
+				+ logGuid + ", logSource=" + logSource + ", metricsGuid="
+				+ metricsGuid + ", annotation=" + annotation + ", egressRules="
+				+ Arrays.toString(egressRules) + ", modificationTag="
+				+ modificationTag + "]";
+	}
 }

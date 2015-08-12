@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.receptor.support;
 
+import java.util.Arrays;
+
 /**
  * @author Mark Fisher
  */
@@ -47,5 +49,11 @@ public class Route {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	@Override
+	public String toString() {
+		return "Route [hostnames=" + Arrays.toString(hostnames) + ", port="
+				+ port + "]";
 	}
 }

@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.receptor.commands;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Arrays;
 
 import org.cloudfoundry.receptor.support.ModificationTag;
 import org.cloudfoundry.receptor.support.Port;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Matt Stine
  * @author Mark Fisher
  */
 public class ActualLRPResponse {
+
+	public static enum State {
+		UNCLAIMED, CLAIMED, RUNNING, CRASHED
+	};
 
 	@JsonProperty("process_guid")
 	private String processGuid;
@@ -42,16 +46,22 @@ public class ActualLRPResponse {
 
 	private int index;
 
+	private State state;
+
 	private String address;
 
 	private Port[] ports;
 
-	private String state;
-
-	private long since;
+	@JsonProperty("placement_error")
+	private String placementError;
 
 	@JsonProperty("crash_count")
 	private int crashCount;
+
+	@JsonProperty("crash_reason")
+	private String crashReason;
+
+	private long since;
 
 	private boolean evacuating;
 
@@ -98,6 +108,14 @@ public class ActualLRPResponse {
 		this.index = index;
 	}
 
+	public String getState() {
+		return state.toString();
+	}
+
+	public void setState(String state) {
+		this.state = State.valueOf(state);
+	}
+
 	public String getAddress() {
 		return address;
 	}
@@ -114,20 +132,12 @@ public class ActualLRPResponse {
 		this.ports = ports;
 	}
 
-	public String getState() {
-		return state;
+	public String getPlacementError() {
+		return placementError;
 	}
 
-	public void setState(String state) {
-		this.state = state;
-	}
-
-	public long getSince() {
-		return since;
-	}
-
-	public void setSince(long since) {
-		this.since = since;
+	public void setPlacementError(String placementError) {
+		this.placementError = placementError;
 	}
 
 	public int getCrashCount() {
@@ -136,6 +146,22 @@ public class ActualLRPResponse {
 
 	public void setCrashCount(int crashCount) {
 		this.crashCount = crashCount;
+	}
+
+	public String getCrashReason() {
+		return crashReason;
+	}
+
+	public void setCrashReason(String crashReason) {
+		this.crashReason = crashReason;
+	}
+
+	public long getSince() {
+		return since;
+	}
+
+	public void setSince(long since) {
+		this.since = since;
 	}
 
 	public boolean isEvacuating() {
@@ -156,11 +182,13 @@ public class ActualLRPResponse {
 
 	@Override
 	public String toString() {
-		return "ActualLRPResponse{" + "processGuid='" + processGuid + '\''
-				+ ", instanceGuid='" + instanceGuid + '\'' + ", cellId='"
-				+ cellId + '\'' + ", domain='" + domain + '\'' + ", index="
-				+ index + ", address='" + address + '\'' + ", ports="
-				+ Arrays.toString(ports) + ", state='" + state + '\''
-				+ ", since=" + since + '}';
+		return "ActualLRPResponse [processGuid=" + processGuid
+				+ ", instanceGuid=" + instanceGuid + ", cellId=" + cellId
+				+ ", domain=" + domain + ", index=" + index + ", state="
+				+ state + ", address=" + address + ", ports="
+				+ Arrays.toString(ports) + ", placementError=" + placementError
+				+ ", crashCount=" + crashCount + ", since=" + since
+				+ ", evacuating=" + evacuating + ", modificationTag="
+				+ modificationTag + "]";
 	}
 }

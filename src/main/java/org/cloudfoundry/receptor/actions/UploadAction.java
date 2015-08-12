@@ -29,6 +29,8 @@ public class UploadAction implements Action {
 
 	private String from;
 
+	private String user = "vcap";
+
 	@JsonProperty("log_source")
 	private String logSource;
 
@@ -56,11 +58,25 @@ public class UploadAction implements Action {
 		this.from = from;
 	}
 
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
 	public String getLogSource() {
 		return logSource;
 	}
 
 	public void setLogSource(String logSource) {
 		this.logSource = logSource;
+	}
+
+	@Override
+	public String toString() {
+		return "UploadAction [artifact=" + artifact + ", to=" + to + ", from="
+				+ from + ", user=" + user + ", logSource=" + logSource + "]";
 	}
 }

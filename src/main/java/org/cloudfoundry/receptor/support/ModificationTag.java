@@ -40,4 +40,9 @@ public class ModificationTag {
 	public void setIndex(int index) {
 		this.index = index;
 	}
+
+	@Override
+	public String toString() {
+		return "ModificationTag [epoch=" + epoch + ", index=" + index + "]";
+	}
 }

@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.cloudfoundry.receptor.actions.RunAction;
+import org.cloudfoundry.receptor.support.EgressRule;
 import org.cloudfoundry.receptor.support.EnvironmentVariable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,8 +36,6 @@ public class TaskCreateRequest {
 	private String taskGuid;
 
 	private String domain = "lattice";
-
-	private String stack = "lucid64";
 
 	private String rootfs;
 
@@ -87,14 +86,6 @@ public class TaskCreateRequest {
 
 	public void setDomain(String domain) {
 		this.domain = domain;
-	}
-
-	public String getStack() {
-		return stack;
-	}
-
-	public void setStack(String stack) {
-		this.stack = stack;
 	}
 
 	public String getRootfs() {
@@ -203,78 +194,14 @@ public class TaskCreateRequest {
 
 	@Override
 	public String toString() {
-		return "TaskCreateRequest [taskGuid=" + taskGuid + ", domain=" + domain + ", stack=" + stack + ", rootfs="
-				+ rootfs + ", env=" + Arrays.toString(env) + ", cpuWeight=" + cpuWeight + ", diskMb=" + diskMb
-				+ ", memoryMb=" + memoryMb + ", privileged=" + privileged + ", runAction=" + runAction
-				+ ", resultFile=" + resultFile + ", completionCallbackUrl=" + completionCallbackUrl + ", logGuid="
-				+ logGuid + ", logSource=" + logSource + ", annotation=" + annotation + ", egressRules="
+		return "TaskCreateRequest [taskGuid=" + taskGuid + ", domain=" + domain
+				+ ", rootfs=" + rootfs + ", env=" + Arrays.toString(env)
+				+ ", cpuWeight=" + cpuWeight + ", diskMb=" + diskMb
+				+ ", memoryMb=" + memoryMb + ", privileged=" + privileged
+				+ ", runAction=" + runAction + ", resultFile=" + resultFile
+				+ ", completionCallbackUrl=" + completionCallbackUrl
+				+ ", logGuid=" + logGuid + ", logSource=" + logSource
+				+ ", annotation=" + annotation + ", egressRules="
 				+ Arrays.toString(egressRules) + "]";
-	}
-
-	public static class EgressRule {
-
-		private String protocol;
-
-		private String[] destinations = new String[] {};
-
-		private PortRange portRange;
-
-		public String getProtocol() {
-			return protocol;
-		}
-
-		public void setProtocol(String protocol) {
-			this.protocol = protocol;
-		}
-
-		public String[] getDestinations() {
-			return destinations;
-		}
-
-		public void setDestinations(String[] destinations) {
-			this.destinations = destinations;
-		}
-
-		public PortRange getPortRange() {
-			return portRange;
-		}
-
-		public void setPortRange(PortRange portRange) {
-			this.portRange = portRange;
-		}
-
-		@Override
-		public String toString() {
-			return "EgressRule [protocol=" + protocol + ", destinations=" + Arrays.toString(destinations)
-					+ ", portRange=" + portRange + "]";
-		}
-	}
-
-	public static class PortRange {
-
-		private int start;
-
-		private int end;
-
-		public int getStart() {
-			return start;
-		}
-
-		public void setStart(int start) {
-			this.start = start;
-		}
-
-		public int getEnd() {
-			return end;
-		}
-
-		public void setEnd(int end) {
-			this.end = end;
-		}
-
-		@Override
-		public String toString() {
-			return "PortRange [start=" + start + ", end=" + end + "]";
-		}
 	}
 }

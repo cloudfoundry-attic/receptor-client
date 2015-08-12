@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.receptor.actions.RunAction;
-import org.cloudfoundry.receptor.client.ReceptorClient;
 import org.cloudfoundry.receptor.commands.ActualLRPResponse;
 import org.cloudfoundry.receptor.commands.CellResponse;
 import org.cloudfoundry.receptor.commands.DesiredLRPCreateRequest;
@@ -41,11 +40,14 @@ import org.cloudfoundry.receptor.commands.DesiredLRPResponse;
 import org.cloudfoundry.receptor.commands.DesiredLRPUpdateRequest;
 import org.cloudfoundry.receptor.commands.TaskCreateRequest;
 import org.cloudfoundry.receptor.commands.TaskResponse;
+import org.cloudfoundry.receptor.support.EgressRule;
+import org.cloudfoundry.receptor.support.EgressRule.PortRange;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,7 @@ import org.springframework.web.client.RestOperations;
 
 /**
  * @author Michael Minella
+ * @author Mark Fisher
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ReceptorClientTests {
@@ -225,14 +228,14 @@ public class ReceptorClientTests {
 		request.setPrivileged(false);
 		request.setLogGuid(request.getTaskGuid());
 		request.setAction(action);
-		TaskCreateRequest.EgressRule rule = new TaskCreateRequest.EgressRule();
+		EgressRule rule = new EgressRule();
 		rule.setProtocol("all");
 		rule.setDestinations(new String[] {"127.0.0.1"});
-		TaskCreateRequest.PortRange portRange = new TaskCreateRequest.PortRange();
+		PortRange portRange = new PortRange();
 		portRange.setStart(123);
 		portRange.setEnd(456);
 		rule.setPortRange(portRange);
-		request.setEgressRules(new TaskCreateRequest.EgressRule[] {rule});
+		request.setEgressRules(new EgressRule[] {rule});
 
 		ArgumentCaptor<TaskCreateRequest> capturedRequest =
 				ArgumentCaptor.forClass(TaskCreateRequest.class);
@@ -408,9 +411,7 @@ public class ReceptorClientTests {
 		assertEquals("123", response.getProcessGuid());
 		assertEquals("foo", response.getAddress());
 		assertEquals("456", response.getCellId());
-		assertEquals(0, response.getCrashCount());
 		assertEquals("bar", response.getDomain());
-		assertFalse(response.isEvacuating());
 		assertEquals(2, response.getIndex());
 		assertEquals("guid", response.getInstanceGuid());
 	}
@@ -420,13 +421,10 @@ public class ReceptorClientTests {
 		response.setProcessGuid("123");
 		response.setAddress("foo");
 		response.setCellId("456");
-		response.setCrashCount(0);
 		response.setDomain("bar");
-		response.setEvacuating(false);
 		response.setIndex(2);
 		response.setInstanceGuid("guid");
 		response.setSince(new Date().getTime());
-
 		return response;
 	}
 
@@ -440,7 +438,6 @@ public class ReceptorClientTests {
 		response.setCellId("cell");
 		response.setFailed(false);
 		response.setState("COMPLETED");
-
 		return response;
 	}
 }

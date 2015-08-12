@@ -119,7 +119,9 @@ public class RunAction implements Action {
 
 	@Override
 	public String toString() {
-		return "RunAction [path=" + path + ", args=" + args + ", dir=" + dir + ", resourceLimits=" + resourceLimits
-				+ ", env=" + Arrays.toString(env) + ", logSource=" + logSource + "]";
+		return "RunAction [path=" + path + ", dir=" + dir + ", user=" + user
+				+ ", args=" + args + ", env=" + Arrays.toString(env)
+				+ ", resourceLimits=" + resourceLimits + ", privileged="
+				+ privileged + ", logSource=" + logSource + "]";
 	}
 }

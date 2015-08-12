@@ -21,16 +21,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.receptor.client.ReceptorClient;
-import org.cloudfoundry.receptor.client.ReceptorOperations;
 import org.cloudfoundry.receptor.client.test.IntegrationTest;
+import org.cloudfoundry.receptor.commands.ActualLRPResponse;
 import org.cloudfoundry.receptor.commands.CellResponse;
 import org.cloudfoundry.receptor.commands.DesiredLRPCreateRequest;
+import org.cloudfoundry.receptor.commands.DesiredLRPResponse;
 import org.cloudfoundry.receptor.commands.TaskCreateRequest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -51,31 +51,52 @@ public class ReceptorClientIntegrationTests {
 
 	@Test
 	public void createAndDeleteLRP() throws Exception {
+		int desiredLrpCountAtStart = client.getDesiredLRPs().size();
+		int actualLrpCountAtStart = client.getActualLRPs().size();
 		DesiredLRPCreateRequest request = new DesiredLRPCreateRequest();
-		request.setProcessGuid("test-app");
+		String processGuid = UUID.randomUUID().toString();
+		request.setProcessGuid(processGuid);
 		request.setRootfs(APP_DOCKER_PATH);
 		request.runAction().setPath("/lattice-app");
 		request.addRoute(8080, "test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io");
+		request.setDomain("yomamma");
 		logger.info("creating LRP: " + objectMapper.writeValueAsString(request));
 		client.createDesiredLRP(request);
-		assertEquals("test-app", client.getDesiredLRPs().get(0).getProcessGuid());
-		assertEquals("test-app", client.getActualLRPs().get(0).getProcessGuid());
-		String[] domains = client.getDomains();
-		assertEquals(1, domains.length);
-		assertEquals("lattice", domains[0]);
-		client.deleteDesiredLRP("test-app");
-		for (int i = 0; i < 1000; i++) {
-			Thread.sleep(100);
-			if (0 == client.getActualLRPsByProcessGuid("test-app").size()) {
+
+		boolean desiredLrpExists = false;
+		for (DesiredLRPResponse desiredLRPResponse : client.getDesiredLRPs()) {
+			if(desiredLRPResponse.getProcessGuid().equals(processGuid)) {
+				desiredLrpExists = true;
 				break;
 			}
 		}
-		assertEquals(0, client.getDesiredLRPs().size());
-		assertEquals(0, client.getActualLRPs().size());
+
+		assertTrue(desiredLrpExists);
+
+		boolean actualLrpExists = false;
+		for (ActualLRPResponse actualLRPResponse : client.getActualLRPs()) {
+			if(actualLRPResponse.getProcessGuid().equals(processGuid)) {
+				actualLrpExists = true;
+				break;
+			}
+		}
+
+		assertTrue(actualLrpExists);
+
+		client.deleteDesiredLRP(processGuid);
+		for (int i = 0; i < 1000; i++) {
+			Thread.sleep(100);
+			if (0 == client.getActualLRPsByProcessGuid(processGuid).size()) {
+				break;
+			}
+		}
+		assertEquals(desiredLrpCountAtStart, client.getDesiredLRPs().size());
+		assertEquals(actualLrpCountAtStart, client.getActualLRPs().size());
 	}
 
 	@Test
 	public void createAndDeleteTask() throws Exception {
+		int tasksAtStart = client.getTasks().size();
 		TaskCreateRequest request = new TaskCreateRequest();
 		request.setTaskGuid("test-task");
 		request.setRootfs("docker:///cloudfoundry/lucid64");
@@ -96,11 +117,12 @@ public class ReceptorClientIntegrationTests {
 		}
 		assertEquals("COMPLETED", client.getTask("test-task").getState());
 		client.deleteTask("test-task");
-		assertEquals(0, client.getTasks().size());
+		assertEquals(tasksAtStart, client.getTasks().size());
 	}
 
 	@Test
 	public void createAndCancelTask() throws Exception {
+		int tasksAtStart = client.getTasks().size();
 		TaskCreateRequest request = new TaskCreateRequest();
 		request.setTaskGuid("test-task");
 		request.setRootfs("docker:///cloudfoundry/lucid64");
@@ -125,11 +147,12 @@ public class ReceptorClientIntegrationTests {
 		assertTrue(cancelled);
 		assertEquals("COMPLETED", client.getTask("test-task").getState());
 		client.deleteTask("test-task");
-		assertEquals(0, client.getTasks().size());
+		assertEquals(tasksAtStart, client.getTasks().size());
 	}
 
 	@Test
 	public void getDomains() {
+		client.upsertDomain("test-domain", 10);
 		String[] domains = client.getDomains();
 		assertNotNull(domains);
 	}
@@ -138,6 +161,6 @@ public class ReceptorClientIntegrationTests {
 	public void getCells() {
 		List<CellResponse> cells = client.getCells();
 		assertEquals(1, cells.size());
-		assertEquals("lattice-cell-01", cells.get(0).getCellId());
+		assertEquals("cell-01", cells.get(0).getCellId());
 	}
 }

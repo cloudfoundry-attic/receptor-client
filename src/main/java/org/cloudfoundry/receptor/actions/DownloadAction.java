@@ -29,6 +29,8 @@ public class DownloadAction implements Action {
 
 	private String to;
 
+	private String user = "vcap";
+
 	@JsonProperty("cache_key")
 	private String cacheKey;
 
@@ -59,6 +61,14 @@ public class DownloadAction implements Action {
 		this.to = to;
 	}
 
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
 	public String getCacheKey() {
 		return cacheKey;
 	}
@@ -73,5 +83,12 @@ public class DownloadAction implements Action {
 
 	public void setLogSource(String logSource) {
 		this.logSource = logSource;
+	}
+
+	@Override
+	public String toString() {
+		return "DownloadAction [artifact=" + artifact + ", from=" + from
+				+ ", to=" + to + ", user=" + user + ", cacheKey=" + cacheKey
+				+ ", logSource=" + logSource + "]";
 	}
 }
