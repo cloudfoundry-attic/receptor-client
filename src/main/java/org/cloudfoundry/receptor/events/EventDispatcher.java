@@ -36,7 +36,6 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -84,7 +83,7 @@ public class EventDispatcher implements Runnable {
 				restTemplate.execute(url, HttpMethod.GET, requestCallback, responseExtractor);
 			}
 			catch (Exception e) {
-				throw new IllegalStateException("Exception while reading event stream.", e);
+				logger.warn("Exception while reading event stream.", e);
 			}
 		}
 	}
@@ -129,16 +128,12 @@ public class EventDispatcher implements Runnable {
 					if (line.startsWith("id:")) {
 						builder = EventBuilder.setId(Integer.parseInt(line.split(":")[1].trim()));
 					}
-					else if (line.startsWith("event:")) {
+					else if (line.startsWith("event:") && builder != null) {
 						builder = builder.setType(line.split(":", 2)[1].trim());
 					}
 					else if (line.startsWith("data:") && builder != null) {
-						ReceptorEvent<?> event = ((TypedEventBuilder<?, ?>) builder).setData(line.split(":", 2)[1].trim());
-						dispatchEvent(event);
-						event = null;
-					}
-					if (!StringUtils.hasText(line)) {
-						break;
+						dispatchEvent(((TypedEventBuilder<?, ?>) builder).setData(line.split(":", 2)[1].trim()));
+						builder = null;
 					}
 				}
 			}
