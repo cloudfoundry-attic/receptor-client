@@ -58,22 +58,25 @@ publishing {
     repositories {
         maven {
             credentials {
-                username '<user>'     //TODO: get from env var
-                password '<password>' //TODO: get from env var
+                username "$System.env.RC_REP_USER"
+                password "$System.env.RC_REP_PASSWORD"
             }
-            url "http://repo.spring.io/libs-snapshot-local" //TODO: get from env var
+            url "$System.env.RC_REPOSITORY" //i.e. http://repo.spring.io/libs-snapshot-local
         }
     }
 
     publications {
         maven(MavenPublication) {
+            artifactId 'receptor-client'
             from components.java
 
             artifact sourcesJar {
+                artifactId 'receptor-client'
                 classifier "sources"
             }
 
             artifact javadocJar {
+                artifactId 'receptor-client'
                 classifier "javadoc"
             }
         }
