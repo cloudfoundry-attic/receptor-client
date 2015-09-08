@@ -76,7 +76,7 @@ public class ReceptorClient implements ReceptorOperations {
 	protected ReceptorClient(String receptorHost, RestOperations restTemplate) {
 		this.baseUrl = (receptorHost.contains("://") ? receptorHost : "http://" + receptorHost) + "/v1";
 		this.restTemplate = restTemplate;
-		this.eventDispatcher = new EventDispatcher(String.format("%s/events", baseUrl));
+		this.eventDispatcher = new EventDispatcher(String.format("%s/events", baseUrl), restTemplate);
 	}
 
 	/* (non-Javadoc)

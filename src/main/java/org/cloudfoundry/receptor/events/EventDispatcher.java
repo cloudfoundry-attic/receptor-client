@@ -38,6 +38,7 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -58,11 +59,13 @@ public class EventDispatcher implements Runnable {
 
 	private final Set<EventListener<?>> listeners = new CopyOnWriteArraySet<EventListener<?>>();
 
-	private final RestTemplate restTemplate = new RestTemplate();
+	private final RestOperations restTemplate;
 
-	public EventDispatcher(String url) {
+	public EventDispatcher(String url, RestOperations restTemplate) {
 		Assert.hasText(url, "URL is required");
+		Assert.notNull(restTemplate, "RestTemplate is required");
 		this.url = url;
+		this.restTemplate = restTemplate;
 		this.backgroundExecutor = Executors.newSingleThreadExecutor(new CustomizableThreadFactory("receptor-event-subscriber-"));
 		this.dispatchingExecutor = Executors.newCachedThreadPool(new CustomizableThreadFactory("receptor-event-dispatcher-"));
 	}
