@@ -22,10 +22,7 @@ import java.util.Map;
 
 import org.cloudfoundry.receptor.actions.Action;
 import org.cloudfoundry.receptor.actions.RunAction;
-import org.cloudfoundry.receptor.support.EgressRule;
-import org.cloudfoundry.receptor.support.EnvironmentVariable;
-import org.cloudfoundry.receptor.support.ModificationTag;
-import org.cloudfoundry.receptor.support.Route;
+import org.cloudfoundry.receptor.support.*;
 
 import org.springframework.util.ObjectUtils;
 
@@ -37,6 +34,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author Mark Fisher
+ * @author Matt Stine
  */
 public class DesiredLRPCreateRequest {
 
@@ -78,6 +76,7 @@ public class DesiredLRPCreateRequest {
 
 	private int[] ports = new int[] { 8080 };
 
+	@JsonDeserialize(using = RouteMapDeserializer.class)
 	private Map<String, Route[]> routes = new HashMap<String, Route[]>();
 
 	@JsonProperty("log_guid")
@@ -229,8 +228,12 @@ public class DesiredLRPCreateRequest {
 		this.routes = routes;
 	}
 
-	public void addRoute(int port, String... hostnames) {
-		this.routes.put("cf-router", ObjectUtils.addObjectToArray(this.routes.get("cf-router"), new Route(port, hostnames)));
+	public void addHttpRoute(int port, String... hostnames) {
+		this.routes.put("cf-router", ObjectUtils.addObjectToArray(this.routes.get("cf-router"), new HttpRoute(port, hostnames)));
+	}
+
+	public void addTcpRoute(int externalPort, int containerPort) {
+		this.routes.put("tcp-router", ObjectUtils.addObjectToArray(this.routes.get("tcp-router"), new TcpRoute(externalPort, containerPort)));
 	}
 
 	public String getLogGuid() {

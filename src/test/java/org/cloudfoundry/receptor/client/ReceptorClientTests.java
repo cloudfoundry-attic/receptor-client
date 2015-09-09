@@ -57,6 +57,7 @@ import org.springframework.web.client.RestOperations;
 /**
  * @author Michael Minella
  * @author Mark Fisher
+ * @author Matt Stine
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ReceptorClientTests {
@@ -93,8 +94,23 @@ public class ReceptorClientTests {
 	}
 
 	@Test
+	public void testCreateDesiredLRPWithTcpRoute() throws Exception {
+		ArgumentCaptor<DesiredLRPCreateRequest> requestCaptor = ArgumentCaptor.forClass(DesiredLRPCreateRequest.class);
+
+		DesiredLRPCreateRequest request = getDesiredLRPCreateRequestWithTcpRoute();
+
+		receptorClient.createDesiredLRP(request);
+
+		verify(restTemplate).postForEntity(eq("{baseUrl}/desired_lrps"), requestCaptor.capture(), (Class) isNull(), eq(BASE_URL));
+		verifyNoMoreInteractions(restTemplate);
+
+		DesiredLRPCreateRequest receivedRequest = (DesiredLRPCreateRequest) requestCaptor.getValue();
+		assertDesiredLRPRequest(receivedRequest);
+	}
+
+	@Test
 	public void testGetDesiredLRP() {
-		ResponseEntity<DesiredLRPResponse> entity = new ResponseEntity(getDesiredLRPResponse(), HttpStatus.OK);
+		ResponseEntity<DesiredLRPResponse> entity = new ResponseEntity(getDesiredLRPResponseWithTcpRoute(), HttpStatus.OK);
 
 		when(restTemplate.exchange("{baseUrl}/desired_lrps/{processGuid}", HttpMethod.GET, null, DesiredLRPResponse.class, BASE_URL, "123")).thenReturn(entity);
 
@@ -394,7 +410,7 @@ public class ReceptorClientTests {
 		request.setProcessGuid("test-app");
 		request.setRootfs(APP_DOCKER_PATH);
 		request.runAction().setPath("/lattice-app");
-		request.addRoute(8080, "test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io");
+		request.addHttpRoute(8080, "test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io");
 		return request;
 	}
 
@@ -403,7 +419,25 @@ public class ReceptorClientTests {
 		response.setProcessGuid("123");
 		response.setRootfs(APP_DOCKER_PATH);
 		response.runAction().setPath("/lattice-app");
-		response.addRoute(8080, "test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io");
+		response.addHttpRoute(8080, "test-app.192.168.11.11.xip.io", "test-app-8080.192.168.11.11.xip.io");
+		return response;
+	}
+
+	private DesiredLRPCreateRequest getDesiredLRPCreateRequestWithTcpRoute() {
+		DesiredLRPCreateRequest request = new DesiredLRPCreateRequest();
+		request.setProcessGuid("test-app");
+		request.setRootfs(APP_DOCKER_PATH);
+		request.runAction().setPath("/lattice-app");
+		request.addTcpRoute(8080, 8080);
+		return request;
+	}
+
+	private DesiredLRPResponse getDesiredLRPResponseWithTcpRoute() {
+		DesiredLRPResponse response = new DesiredLRPResponse();
+		response.setProcessGuid("123");
+		response.setRootfs(APP_DOCKER_PATH);
+		response.runAction().setPath("/lattice-app");
+		response.addTcpRoute(8080, 8080);
 		return response;
 	}
 

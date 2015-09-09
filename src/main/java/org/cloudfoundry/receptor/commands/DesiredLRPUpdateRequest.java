@@ -19,16 +19,21 @@ package org.cloudfoundry.receptor.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.receptor.support.HttpRoute;
 import org.cloudfoundry.receptor.support.Route;
+import org.cloudfoundry.receptor.support.TcpRoute;
 import org.springframework.util.ObjectUtils;
 
 /**
  * @author Mark Fisher
+ * @author Matt Stine
  */
 public class DesiredLRPUpdateRequest {
 
 	private int instances = 1;
 
+	@JsonDeserialize(using = RouteMapDeserializer.class)
 	private Map<String, Route[]> routes = new HashMap<String, Route[]>();
 
 	private String annotation;
@@ -49,8 +54,12 @@ public class DesiredLRPUpdateRequest {
 		this.routes = routes;
 	}
 
-	public void addRoute(int port, String... hostnames) {
-		this.routes.put("cf-router", ObjectUtils.addObjectToArray(this.routes.get("cf-router"), new Route(port, hostnames)));
+	public void addHttpRoute(int port, String... hostnames) {
+		this.routes.put("cf-router", ObjectUtils.addObjectToArray(this.routes.get("cf-router"), new HttpRoute(port, hostnames)));
+	}
+
+	public void addTcpRoute(int externalPort, int containerPort) {
+		this.routes.put("tcp-router", ObjectUtils.addObjectToArray(this.routes.get("tcp-router"), new TcpRoute(externalPort, containerPort)));
 	}
 
 	public void setAnnotation(String annotation) {
