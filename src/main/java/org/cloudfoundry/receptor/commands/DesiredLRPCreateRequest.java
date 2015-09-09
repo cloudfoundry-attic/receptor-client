@@ -22,7 +22,12 @@ import java.util.Map;
 
 import org.cloudfoundry.receptor.actions.Action;
 import org.cloudfoundry.receptor.actions.RunAction;
-import org.cloudfoundry.receptor.support.*;
+import org.cloudfoundry.receptor.support.EgressRule;
+import org.cloudfoundry.receptor.support.EnvironmentVariable;
+import org.cloudfoundry.receptor.support.HttpRoute;
+import org.cloudfoundry.receptor.support.ModificationTag;
+import org.cloudfoundry.receptor.support.Route;
+import org.cloudfoundry.receptor.support.TcpRoute;
 
 import org.springframework.util.ObjectUtils;
 
@@ -61,14 +66,14 @@ public class DesiredLRPCreateRequest {
 	private boolean privileged;
 
 	@JsonInclude(Include.NON_EMPTY)
-	@JsonDeserialize(using = ActionMapSerializer.class)
+	@JsonDeserialize(using = ActionMapDeserializer.class)
 	private Map<String, Action> setup = new HashMap<String, Action>();
 
-	@JsonDeserialize(using = ActionMapSerializer.class)
+	@JsonDeserialize(using = ActionMapDeserializer.class)
 	private Map<String, Action> action = new HashMap<String, Action>();
 
 	@JsonInclude(Include.NON_EMPTY)
-	@JsonDeserialize(using = ActionMapSerializer.class)
+	@JsonDeserialize(using = ActionMapDeserializer.class)
 	private Map<String, Action> monitor = new HashMap<String, Action>();
 
 	@JsonProperty("start_timeout")

@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * @author Mark Fisher
  */
-public class ActionMapSerializer extends JsonDeserializer<Map<String, Action>> {
+public class ActionMapDeserializer extends JsonDeserializer<Map<String, Action>> {
 
 	private static final String DOWNLOAD_KEY = "download";
 

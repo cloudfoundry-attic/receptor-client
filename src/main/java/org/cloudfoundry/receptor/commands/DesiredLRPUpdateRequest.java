@@ -19,11 +19,13 @@ package org.cloudfoundry.receptor.commands;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.receptor.support.HttpRoute;
 import org.cloudfoundry.receptor.support.Route;
 import org.cloudfoundry.receptor.support.TcpRoute;
+
 import org.springframework.util.ObjectUtils;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author Mark Fisher
