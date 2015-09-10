@@ -60,20 +60,39 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 artifacts {
-    archives jar
+    archives sourcesJar
+    archives javadocJar
 }
 
 publishing {
+    repositories {
+        maven {
+            credentials {
+                username "$System.env.RC_REP_USER"
+                password "$System.env.RC_REP_PASSWORD"
+            }
+            url "$System.env.RC_REPOSITORY" //i.e. http://repo.spring.io/libs-snapshot-local
+        }
+    }
+
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
+            artifactId 'receptor-client'
             from components.java
 
-            // Override the default artifact ID
-            artifactId = 'receptor-client'
+            artifact sourcesJar {
+                artifactId 'receptor-client'
+                classifier "sources"
+            }
 
+            artifact javadocJar {
+                artifactId 'receptor-client'
+                classifier "javadoc"
+            }
         }
     }
 }
+
 eclipse {
     classpath {
          containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
