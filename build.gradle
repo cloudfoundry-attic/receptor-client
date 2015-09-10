@@ -1,15 +1,25 @@
+description = 'Receptor Client'
+
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply from:   "${rootProject.projectDir}/publish-maven.gradle"
+
+ext {
+    linkHomepage = 'https://github.com/cloudfoundry-incubator/receptor-client'
+    linkCi = 'https://build.spring.io/browse/RC-RC'
+    linkIssue = 'https://github.com/cloudfoundry-incubator/receptor-client/issues'
+    linkScmUrl = 'https://github.com/cloudfoundry-incubator/receptor-client'
+    linkScmConnection = 'scm:git:git://github.com/cloudfoundry-incubator/receptor-client.git'
+    linkScmDevConnection = 'scm:git:ssh://git@github.com:cloudfoundry-incubator/receptor-client.git'
+}
 
 group = 'org.cloudfoundry.receptor'
-version = '0.0.1-SNAPSHOT'
 
 jar {
     baseName = 'receptor-client'
 }
+
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
@@ -18,10 +28,10 @@ repositories {
 }
 
 dependencies {
-	compile("com.fasterxml.jackson.core:jackson-databind:2.6.1")
-	compile("org.springframework:spring-web:4.2.1.RELEASE")
-	testCompile('org.mockito:mockito-core:1.10.19')
-	testCompile("junit:junit:4.12")
+    compile("com.fasterxml.jackson.core:jackson-databind:2.6.1")
+    compile("org.springframework:spring-web:4.2.1.RELEASE")
+    testCompile('org.mockito:mockito-core:1.10.19')
+    testCompile("junit:junit:4.12")
 }
 
 test {
@@ -54,35 +64,6 @@ artifacts {
     archives javadocJar
 }
 
-publishing {
-    repositories {
-        maven {
-            credentials {
-                username "$System.env.RC_REP_USER"
-                password "$System.env.RC_REP_PASSWORD"
-            }
-            url "$System.env.RC_REPOSITORY" //i.e. http://repo.spring.io/libs-snapshot-local
-        }
-    }
-
-    publications {
-        maven(MavenPublication) {
-            artifactId 'receptor-client'
-            from components.java
-
-            artifact sourcesJar {
-                artifactId 'receptor-client'
-                classifier "sources"
-            }
-
-            artifact javadocJar {
-                artifactId 'receptor-client'
-                classifier "javadoc"
-            }
-        }
-    }
-}
-
 eclipse {
     classpath {
          containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
@@ -91,5 +72,7 @@ eclipse {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '2.5'
+    distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
